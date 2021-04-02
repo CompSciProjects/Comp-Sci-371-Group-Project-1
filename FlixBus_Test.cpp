@@ -1,6 +1,9 @@
+#include "Administration.h"
+#include "Reservation.h"
 #include <iostream>
+using namespace std;
 
-/*A  local  bus  company  ìFlixBusî  wants  to  hire  you  to  automate  their  processes.  
+/*A  local  bus  company  ‚ÄúFlixBus‚Äù  wants  to  hire  you  to  automate  their  processes.  
 These  include  the  ticketing, reservation, routing, customer service, resource management and administration. 
 The bus company has three different type vehicles: (1) luxury bus (2) mini bus, and (3) minivan. 
 There are 3 luxury buses, 4 small buses and 4 minivans. The luxury bus has 52 seats (2x11 seats and 3x10 seats), 
@@ -24,5 +27,39 @@ Green Bay	Eau Claire		194.4 miles*/
 
 int main()
 {
+	int option = 0;
+
+	cout << "Welcome to the FlixBus automated system!\n\n";
+
+	//Allows user to choose a menu option or exit the system
+	while(option != 3)
+	{
+		
+		cout << "1. Administrator Menu\n"
+			<< "2. Customer Menu\n"
+			<< "3. Exit\n"
+			<< "Please select an option 1, 2, or 3:";
+		cin >> option;
+		cout << "\n";
+
+		switch (option)
+		{
+		case 1:
+			Admin admin;
+			admin.AdminMenu();
+			break;
+		case 2:
+			Reservation customer;
+			customer.CustomerMenu();
+			break;
+		case 3:
+			cout << "Thank you for using the FlixBus automated system! Goodbye!\n\n";
+			break;
+		default:
+			cout << "That is not a valid option.\n\n";
+			break;
+		}
+	}
+
 	return 0;
 }
