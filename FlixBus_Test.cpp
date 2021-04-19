@@ -30,7 +30,7 @@ int main()
 	int option = 0;
 
 	cout << "Welcome to the FlixBus automated system!\n\n";
-
+	
 	//Allows user to choose a menu option or exit the system
 	while(option != 3)
 	{
@@ -45,12 +45,10 @@ int main()
 		switch (option)
 		{
 		case 1:
-			Admin admin;
-			admin.AdminMenu();
+			Admin().AdminMenu();
 			break;
 		case 2:
-			Reservation customer;
-			customer.CustomerMenu();
+			Reservation().CustomerMenu();
 			break;
 		case 3:
 			cout << "Thank you for using the FlixBus automated system! Goodbye!\n\n";
