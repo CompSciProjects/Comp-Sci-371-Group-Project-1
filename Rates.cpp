@@ -32,6 +32,22 @@ The  company  wants  to  profit  25%  on  all  ticket  sales  and  hire.  Rememb
 Passengers’   refunds  are  also  taxable.  
 All  sales  need  to  store  permanently in file(s) so that they can retrieve later for administration tasks.*/
 
+string luxBusString, miniBusString, miniVanString;
+
+//seat cost rates
+double LUXURYAISLEANDWINDOW = 0.95; //In  luxury  bus, aisle  and  window  seat  costs   $0.95  per  mile
+double LUXURYOTHER = 0.75;		  //the other seat  costs  $0.75 per mile
+double MINIBUSSEAT = 0.65;		  //In small bus, both the aisle seat and window seat costs 0.65
+double MINIVANSEAT = 0.5;				  //In case of the minivan, each seat cost $0.50 per  mile
+
+//Bus Hire rates
+double LUXURYBH[3] = { 1500, 0.25, 5000 };   //In  case  of  bus  hire,  the  luxury  bus  cost  $1500 as rent with additional $0.25 for each  mile  of travel. 
+                                            //The  security  deposit  for  luxury  bus  is  $5000
+double MINIBUSBH[3] = { 1300, 0.2, 3000 };  //The  small  bus  costs   $1300  as  rent  with  additional  $0.20  per  mile
+                                            //The  security  deposit for  the  small  bus  $3000 
+double MINIVANBH[3] = { 1000, 0.15, 1500 };	    //the minivan  costs  $1000  as  rent  with  additional  $0.15  per  mile
+                                            //The security deposit for  the  minivan  it  is  $1500  
+
 double Rates::GetRate(int* Tickets, int BusType, bool IsBusHire) //Method totals up rates for all tickets purchased
 {
 
@@ -150,7 +166,7 @@ double Rates::GetPenalty(Date Day, string Reason) //Method finds penalty if the 
         localtime_s(&newtime, &ttime);
 
         //Initializes the date in newtime to an object of Date, which can be used to compare date for the tickets
-        Date CurrentDate(1900 + newtime.tm_year, 1 + newtime.tm_mon, newtime.tm_mday);
+        Date CurrentDate(1 + newtime.tm_mon, newtime.tm_mday, 1900 + newtime.tm_year);
         int DaysBefore;
 
         //Checks if trip is within 7 of now 
@@ -184,7 +200,7 @@ double Rates::GetAmount(Rates Rates, bool IsBusHire, int BusType) //Method takes
 {
     double amount = 0;
     
-    if (Rates.reason.compare(Reasons[2]) == 0) //If reason for transaction is refund, 
+    if ((Rates.reason.compare(Reasons[2]) == 0) || (Rates.reason.compare(Reasons[3]) == 0)) //If reason for transaction is refund, 
     {
         //amount is negative due to giving money back to customer
         //penalty amount is taken out of deposit (if applicable)
@@ -192,7 +208,7 @@ double Rates::GetAmount(Rates Rates, bool IsBusHire, int BusType) //Method takes
         //tax is subtracted from (rate times distance plus rental fee)  but not the deposit because deposit  is  not  taxable
         amount = -1 * ((Rates.deposit * (1 - Rates.penalty)) + ((((Rates.rate * Rates.distance) + Rates.rentalFee) ) * (1 - Rates.penalty)) - ((((Rates.rate * Rates.distance) + Rates.rentalFee)) * (1 - Rates.penalty) * (Rates.tax - 1)));
     }
-    else //If reason besides refund,
+    else //If reason besides refund or company authorized cancellation,
     {
         //Add deposit
         //add (rate times distance plus rental fee times tax)
@@ -200,6 +216,67 @@ double Rates::GetAmount(Rates Rates, bool IsBusHire, int BusType) //Method takes
         amount = Rates.deposit + (((Rates.rate * Rates.distance) + Rates.rentalFee) * Rates.tax);
     }
     return amount;
+}
+double Rates::setLuxSeatRate(double changeAmountWindow, double changeAmount) {
+    LUXURYAISLEANDWINDOW = changeAmountWindow;
+    LUXURYOTHER = changeAmount;
+    return LUXURYAISLEANDWINDOW, LUXURYOTHER;
+}
+
+double Rates::setMiniBusSeatRate(double changeAmount) {
+    MINIBUSSEAT = changeAmount;
+    return MINIBUSSEAT;
+}
+
+double Rates::setMiniVanSeatRate(double changeAmount) {
+    MINIVANSEAT = changeAmount;
+    return MINIVANSEAT;
+}
+
+double Rates::setLuxBusRate(double changeAmount, double mileCost, double secDeposit) {
+    LUXURYBH[0] = changeAmount;
+    LUXURYBH[1] = mileCost;
+    LUXURYBH[2] = secDeposit;
+    cout << "New Luxury bus flat fee: " << LUXURYBH[0]
+        << "\nNew milage fee: " << LUXURYBH[1]
+        << "\nNew security deposit fee: " << LUXURYBH[2] << "\n\n";
+    return *LUXURYBH;
+}
+
+double Rates::setMiniBusRate(double changeAmount, double mileCost, double secDeposit) {
+    MINIBUSBH[0] = changeAmount;
+    MINIBUSBH[1] = mileCost;
+    MINIBUSBH[2] = secDeposit;
+    cout << "New MiniBus flat fee: " << MINIBUSBH[0]
+        << "\nNew milage fee: " << MINIBUSBH[1]
+        << "\nNew security deposit fee: " << MINIBUSBH[2] << "\n\n";
+    return *MINIBUSBH;
+}
+
+double Rates::setMiniVanRate(double changeAmount, double mileCost, double secDeposit) {
+    MINIVANBH[0] = changeAmount;
+    MINIVANBH[1] = mileCost;
+    MINIVANBH[2] = secDeposit;
+    cout << "New MiniVan flat fee: " << MINIVANBH[0]
+        << "\nNew milage fee: " << MINIVANBH[1]
+        << "\nNew security deposit fee: " << MINIVANBH[2] << "\n\n";
+    return *MINIVANBH;
+}
+
+double Rates::getLuxSeatRate() {
+    return LUXURYOTHER;
+}
+
+double Rates::getLuxSeatRateWindow() {
+    return LUXURYAISLEANDWINDOW;
+}
+
+double Rates::getMiniBussSeatRate() {
+    return MINIBUSSEAT;
+}
+
+double Rates::getMiniVanSeatRate() {
+    return MINIVANSEAT;
 }
 
 void Rates::SaveTransaction(Reservation Reservation, int Destination, int BusType, string Reason) //Writes transaction information to file
