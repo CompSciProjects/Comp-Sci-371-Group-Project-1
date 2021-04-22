@@ -1,7 +1,9 @@
 #include "Reservation.h"
 #include "Rates.h"
+#include "Scheduling.h"
 #include "Date.h"
 #include <iostream>
+#include <time.h>
 using namespace std;
 
 /*Passengers  can  reserve  seats  2  weeks  in  advance.  
@@ -25,22 +27,175 @@ it is always better to allow for bus hire. The reserving customer hiring the bus
 biographical  information  as  for  normal  ticket  reservation.
 All  kinds  of  information  regarding  the   hire   needs   to   store   permanently   in   file(s)
 so   that   they   can   retrieve   later   for   administration tasks.*/
+string months[12] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
 string Reservation::GetName()
 {
 	return this->name;
 }
 
-void Reservation::SetDateOfTravel(int Month, int Day, int Year)
+string Reservation::getBusName()
 {
+	return this->busType;
+}
+
+void Reservation::SetDateOfTravel()
+{
+	int Month;
+	int Day;
+	int Year = 2021;
+	time_t ttime = time(0);
+	localtime_s(&tm, &ttime);
+	Date CurrentDate(1 + tm.tm_mon, tm.tm_mday, 1900 + tm.tm_year);
+	int CurrentMonth = tm.tm_mon + 1;
+
+
+	int threeMonths = tm.tm_mon + 3;
+	if ((CurrentMonth == 2 && tm.tm_mday > 14) || (CurrentMonth != 2 && tm.tm_mday > 16))
+	{
+		
+		(CurrentMonth == 12)? CurrentMonth = 1 : CurrentMonth++;
+		threeMonths++;
+	}
+
+	int year = tm.tm_year + 1900;
+	cout << "\n";
+	for (int i = CurrentMonth - 1; i < 12; i++)
+	{
+		if(i < threeMonths)
+		{
+			cout << i + 1 << ". " << months[i] << " " << year << "\n";
+			if (i == 11 && threeMonths > 11)
+			{
+				for (int j = 0; j < threeMonths - 12; j++)
+				{
+					cout << j + 1 << ". " << months[j] << " " << year + 1 << "\n";
+				}
+			}
+		}
+		
+	}
+	cout << "\n";
+	cout << "Please enter the month in which you want to travel corresponding to the numbers above: ";
+	cin >> Month;
+	if (Month != CurrentMonth && (Month != ((CurrentMonth == 11 || CurrentMonth == 12)? CurrentMonth - 10 : CurrentMonth + 2)) && (Month != ((CurrentMonth == 12)? CurrentMonth - 11 : CurrentMonth + 1 )))
+	{
+		while(Month != CurrentMonth && (Month != ((CurrentMonth == 11 || CurrentMonth == 12) ? CurrentMonth - 10 : CurrentMonth + 2)) && (Month != ((CurrentMonth == 12) ? CurrentMonth - 11 : CurrentMonth + 1)))
+		{
+			cout << "The month you entered is not valid.\n"
+				<< "Please enter the month in which you want to travel corresponding to the numbers above: ";
+			cin >> Month;
+		}
+	}
+
+	if (CurrentMonth > Month && threeMonths > 12)
+	{
+		year++;
+	}
+
+	cout << "Please enter the day you wish to travel in " << months[Month-1] << " (Must be at least 2 weeks out): ";
+	cin >> Day;
+
+	int DaysBefore = this->DateValidation(Date(Month, Day, year));
+	switch (Month)
+	{
+	case 1:
+	case 3:
+	case 5:
+	case 7:
+	case 8:
+	case 10:
+	case 12:
+		if (Day < 1 || Day > 31 || DaysBefore < 14)
+		{
+			while (Day < 1 || Day > 31 || DaysBefore < 14)
+			{
+				cout << "The day you entered is not valid.\n"
+					<< "Please enter the day you wish to travel in " << months[Month-1] << ": ";
+				cin >> Day;
+
+				DaysBefore = this->DateValidation(Date(Month, Day, year));
+			}
+		}
+		break;
+	case 4:
+	case 6:
+	case 9:
+	case 11:
+		if (Day < 1 || Day > 30 || DaysBefore < 14)
+		{
+			while (Day < 1 || Day > 30 || DaysBefore < 14)
+			{
+				cout << "The day you entered is not valid.\n"
+					<< "Please enter the day you wish to travel in " << months[Month - 1] << ": ";
+				cin >> Day;
+
+				DaysBefore = this->DateValidation(Date(Month, Day, year));
+			}
+		}
+		break;
+	case 2:
+		bool leapYear;
+		if (Year % 4 == 0)
+		{
+			leapYear = true;
+		}
+		else
+		{
+			leapYear = false;
+		}
+
+		if (Day < 0 || (leapYear) ? Day > 29 : Day > 28 || DaysBefore < 14)
+		{
+			while (Day < 0 || (leapYear) ? Day > 29 : Day > 28 || DaysBefore < 14)
+			{
+				cout << "The day you entered is not valid.\n"
+					<< "Please enter the day you wish to travel in " << months[Month - 1] << ": ";
+				cin >> Day;
+
+				DaysBefore = this->DateValidation(Date(Month, Day, year));
+			}
+		}
+		break;
+	}
+
+
 	this->dateOfTravel.SetMonth(Month);
 	this->dateOfTravel.SetDay(Day);
-	this->dateOfTravel.SetYear(Year);
+	this->dateOfTravel.SetYear(year);
+
+	int changeYear = year - 1900;
+
+	tm.tm_mon = Month;
+	tm.tm_mday = Day;
+	tm.tm_year = changeYear;
 }
 
 Date Reservation::GetDateOfTravel()
 {
 	return this->dateOfTravel;
+}
+
+int Reservation::DateValidation(Date date)
+{
+	int DaysBefore;
+	Date Current(1 + tm.tm_mon, tm.tm_mday, 1900 + tm.tm_year);
+
+	//Checks if trip is within 14 of now 
+	for (DaysBefore = 0; DaysBefore < 14; DaysBefore++)
+	{
+		if (Current.toString().compare(date.toString()) == 0)
+		{
+			break;
+		}
+		Current.nextDay();
+	}
+	return DaysBefore;
+}
+
+struct tm Reservation::GetWeekNum()
+{
+	return tm;
 }
 
 int Reservation::GetDestination(string Destination)
@@ -141,9 +296,6 @@ void Reservation::SetGeneralReservationInfo()
 	string Address;
 	string ContactNumber;
 	string Email;
-	int Month;
-	int Day;
-	int Year = 2021;
 	int Destination;
 	int BusType;
 
@@ -152,119 +304,39 @@ void Reservation::SetGeneralReservationInfo()
 	getline(cin, Name);
 
 	cout << "Please enter your address: ";
-	cin.ignore();
+	cin.ignore(0, EOF);
 	getline(cin, Address);
 
 	cout << "Please enter your phone number: ";
-	cin.ignore();
+	cin.ignore(0, EOF);
 	getline(cin, ContactNumber);
 
 	cout << "Please enter your email address: ";
-	cin.ignore();
+	cin.ignore(0, EOF);
 	getline(cin, Email);
+
+	this->SetDateOfTravel();
+	
+	cout << "\n\n";
 
 	//THIS SECTION IS ONLY TO TEMPORARILY FILL THE TRIP DETAIL VARIABLES
 	//ONCE THE SCHEDULING SECTION IS COMPLETE, THE FUNCTIONS FROM SCHEDULING WILL
-	//BE USED TO DETERMINE AVAILABILITY
-	cout << "\n\n1. January\n"
-		<< "2. February\n"
-		<< "3. March\n"
-		<< "4. April\n"
-		<< "5. May\n"
-		<< "6. June\n"
-		<< "7. July\n"
-		<< "8. August\n"
-		<< "9. September\n"
-		<< "10. October\n"
-		<< "11. November\n"
-		<< "12. December\n\n";
-	cout << "Please enter the month in which you want to travel corresponding to the numbers above: ";
-	cin >> Month;
-	if (Month < 1 || Month > 12)
-	{
-		while (Month < 1 || Month > 12)
-		{
-			cout << "The month you entered is not valid.\n"
-				<< "Please enter the month in which you want to travel corresponding to the numbers above: ";
-			cin >> Month;
-		}
-	}
-
-	cout << "Please enter the day you wish to travel in month " << Month << ": ";
-	cin >> Day;
-	switch (Month)
-	{
-	case 1:
-	case 3:
-	case 5:
-	case 7:
-	case 8:
-	case 10:
-	case 12:
-		if (Day < 1 || Day > 31)
-		{
-			while (Day < 1 || Day > 31)
-			{
-				cout << "The day you entered is not valid for month " << Month << ".\n"
-					<< "Please enter the day you wish to travel in month " << Month << " (Days are between 1 and 31): ";
-				cin >> Day;
-			}
-		}
-		break;
-	case 4:
-	case 6:
-	case 9:
-	case 11:
-		if (Day < 1 || Day > 30)
-		{
-			while (Day < 1 || Day > 30)
-			{
-				cout << "The day you entered is not valid for month " << Month << ".\n"
-					<< "Please enter the day you wish to travel in month " << Month << " (Days are between 1 and 30): ";
-				cin >> Day;
-			}
-		}
-		break;
-	case 2:
-		bool leapYear;
-		if (Year % 4 == 0)
-		{
-			leapYear = true;
-		}
-		else
-		{
-			leapYear = false;
-		}
-
-		if (Day < 0 || (leapYear) ? Day > 29 : Day > 28)
-		{
-			while (Day < 0 || (leapYear) ? Day > 29 : Day > 28)
-			{
-				cout << "The day you entered is not valid for month " << Month << ".\n"
-					<< "Please enter the day you wish to travel in month " << Month
-					<< " (Days are between 1 and " << ((leapYear) ? 29 : 28) << ": ";
-				cin >> Day;
-			}
-		}
-		break;
-	}
-	
-
-	
+	//BE USED TO DETERMINE AVAILABILITY OF BUSSES AND DESTINATIONS
 	for (int i = 0; i < 5; i++)
 	{
 		cout << i + 1 << ". " << Destinations[i] << "\n";
 	}
-	cout << "Please enter which destination you would like to go to on " << Month << "/" << Day << "/" << Year << ": ";
+	cout << "Please enter which destination you would like to go to on " << this->dateOfTravel.toString() << ": ";
 	cin >> Destination;
 	while (Destination < 1 || Destination > 5)
 	{
 		cout << "That is not a valid destination. Valid destinations are 1 through 5.\n"
-			<< "Please enter which destination you would like to go to on " << Month << "/" << Day << "/" << Year << ": ";
+			<< "Please enter which destination you would like to go to on " << this->dateOfTravel.toString() << ": ";
 		cin >> Destination;
 	}
 	Destination--;
 
+	cout << "\n\n";
 	for (int i = 0; i < 3; i++)
 	{
 		cout << i + 1 << ". " << BusTypes[i] << "\n";
@@ -284,7 +356,6 @@ void Reservation::SetGeneralReservationInfo()
 	this->address = Address;
 	this->contactNumber = ContactNumber;
 	this->email = Email;
-	this->SetDateOfTravel(Month, Day, Year);
 	this->destination = Destinations[Destination];
 	this->busType = BusTypes[BusType];
 }
@@ -357,12 +428,13 @@ void Reservation::CancelReservation()
 		Reservation reservation = Reservation().GetReservation(Name, date);
 
 		Rates().SaveTransaction(reservation, reservation.GetDestination(reservation.destination), reservation.GetBusType(reservation.busType), Reasons[2]);
+
+		this->DeleteReservation(reservation);
 	}
-
-
-
-	//Implementation Needed to delete initial reservation record from file
-	
+	else
+	{
+		cout << "Sorry, your reservation was not found. Unable to cancel reservation";
+	}
 
 }
 
@@ -543,7 +615,7 @@ Reservation Reservation::GetReservation(string Name, Date Day)
 
 void Reservation::PrintReservation(Reservation Reservation)
 {
-	cout << "Reservation Details\n\n"
+	cout << "\n\nReservation Details\n\n"
 		<< "Name: " << this->name << "\n"
 		<< "Address: " << this->address << "\n"
 		<< "Contact Number: " << this->contactNumber << "\n"
@@ -558,4 +630,85 @@ void Reservation::PrintReservation(Reservation Reservation)
 		}
 		cout <<"Tickets: " << numTickets << "\n";	//END SECTION
 		cout << ((this->isBusHire)? "This Reservation is for a bus hire." : "This is a personal reservation" ) << "\n\n";
+}
+
+void Reservation::DeleteReservation(Reservation Reservation)
+{
+	//ifstream read("infos.txt");
+	//ofstream write("tmp.txt");
+	//if (read.is_open()) {
+	//	std::string line;
+	//	while (getline(read, line)) {
+	//		if (line.find(ID) != std::string::npos)
+	//			write << line;
+	//	}
+	//}
+	//else {
+	//	std::cerr << "Error: coudn't open file\n";
+	//	/* additional handle */
+	//}
+
+	//read.close();
+	//write.close();
+	//std::remove("infos.txt");
+	//std::rename("tmp.txt", "infos.txt");
+	ifstream output;
+	
+	output.open("./ReservationInput.txt", ios::in);
+
+	ofstream input;
+
+	input.open("./ReservationTemp.txt", ios::out);
+
+	if (output.is_open())
+	{
+		string Name;
+		string Address;
+		string ContactNumber;
+		string Email;
+		string DateOfTravel;
+		string Destination;
+		string BusType;
+		int* Tickets = new int[5]; //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+		bool IsBusHire;
+
+		while (getline(output, Name))
+		{
+			getline(output, Address);
+			getline(output, ContactNumber);
+			getline(output, Email);
+			getline(output, DateOfTravel);
+			getline(output, Destination);
+			getline(output, BusType);
+			for (int i = 0; i < 5; i++) //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+			{
+				output >> Tickets[i];
+			}							//END SECTION
+			output >> IsBusHire;
+
+			if (Name.compare("") != 0 && !(Name.compare(Reservation.name) == 0 && DateOfTravel.compare(Reservation.dateOfTravel.toString()) == 0))
+			{
+				input << Name << endl;
+				input << Address << endl;
+				input << ContactNumber << endl;
+				input << Email << endl;
+				input << DateOfTravel << endl;
+				input << Destination << endl;
+				input << BusType << endl;
+				for (int i = 0; i < 5; i++)			//THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+				{
+					input << Tickets[i] << endl;
+				}									//END SECTION
+				input << IsBusHire << endl;
+			}
+		}
+		cout << "Reservation successfully deleted.\n\n";
+	}
+
+	input.close();
+	output.close();
+	remove("./ReservationInput.txt");
+	rename("./ReservationTemp.txt", "./ReservationInput.txt");
+
+
 }
