@@ -20,6 +20,7 @@ private:
 	string busType;
 	int* tickets;
 	bool isBusHire;
+	struct tm tm;
 
 public:
 	string BusTypes[3] = { "Luxury Bus", "Mini Bus", "Minivan" };
@@ -29,8 +30,11 @@ public:
 	string Reasons[4] = { "Standard Seat Reservations", "Bus Hire", "Cancel Reservation", "Company Authorized Cancellation" };
 
 	string GetName();
-	void SetDateOfTravel(int Month, int Day, int Year);
+	string getBusName();
+	void SetDateOfTravel();
 	Date GetDateOfTravel();
+	int DateValidation(Date date);
+	struct tm GetWeekNum();
 	int GetDestination(string Destination);
 	int GetBusType(string BusType);
 	int* GetTickets();
@@ -44,6 +48,7 @@ public:
 	bool FindReservation(string Name, Date Day);
 	Reservation GetReservation(string Name, Date Day);
 	void PrintReservation(Reservation Reservation);
+	void DeleteReservation(Reservation Reservation);
 
 	//Destructor
 	~Reservation()
