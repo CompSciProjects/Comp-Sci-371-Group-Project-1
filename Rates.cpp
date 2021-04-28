@@ -4,34 +4,6 @@
 #include "Reservation.h"
 using namespace std;
 
-/*The bus company has three different type vehicles: (1) luxury bus (2) mini bus, and (3) minivan. 
-There are 3 luxury buses, 4 small buses and 4 minivans. The luxury bus has 52 seats (2x11 seats and 3x10 seats), 
-the small bus has 36 seats (1x12 and 2x12) and the minivan has 12 seats (3x4).
-In  luxury  bus,  the aisle  and  window  seat  costs   $0.95  per  mile,  and the other seat  costs  $0.75 per mile. 
-In small bus, both the aisle seat and window seat costs 0.65. In case of the minivan, each seat cost $0.50 per  mile.  
-In  case  of  bus  hire,  the  luxury  bus  cost  $1500 as rent with additional $0.25 for each  mile  of travel.  
-The  small  bus  costs   $1300  as  rent  with  additional  $0.20  per  mile  whereas  the minivan  costs  $1000  
-as  rent  with  additional  $0.15  per  mile.  
-The  security  deposit  for  luxury  bus  is  $5000,   for  the  small  bus  $3000  and  for  the  minivan  it  is  $1500  
-which  will  be  reimbursed  upon returning the  vehicle.  
-The  rows  in  the  buses are alphabetically numbered. 
-Thus, the A and C mark the window seats in all kinds of vehicles. 
-However, the B and E are the aisle seats in the luxury bus, B and D are the aisle seats marked in the minibus 
-whereas in the minivan, there is no aisle seat. The buses haul passengers to and from Green Bay  from/to  the  following  routes.  
-The  buses  are  identified  by  unique  identifier  and  have  their  registration details stored including a list of drivers who drive them. 
-A single driver can drive multiple buses. 
-
-Source		Destination		Distance
-Green Bay	Madison			135.6 miles
-Green Bay	Milwaukee		118.7 miles
-Green Bay	Whitewater		142.2 miles
-Green Bay	Oshkosh			50.4 miles
-Green Bay	Eau Claire		194.4 miles
-For  each  ticket  and  bus  hire  is  subject  to  government  tax  of  10%  which  can  change  periodically.  
-The  company  wants  to  profit  25%  on  all  ticket  sales  and  hire.  Remember  that the  security  deposit  is  not  taxable.  
-Passengers’   refunds  are  also  taxable.  
-All  sales  need  to  store  permanently in file(s) so that they can retrieve later for administration tasks.*/
-
 string luxBusString, miniBusString, miniVanString;
 
 //seat cost rates
@@ -131,7 +103,7 @@ double Rates::GetRentalFee(bool IsBusHire, int BusType) //Method finds the renta
     return fee;
 }
 
-double Rates::GetDeposit(bool IsBusHire, int BusType)
+double Rates::GetDeposit(bool IsBusHire, int BusType) //Method finds deposit amount, if applicable
 {
     double deposit = 0;
     if (IsBusHire) 
@@ -217,23 +189,35 @@ double Rates::GetAmount(Rates Rates, bool IsBusHire, int BusType) //Method takes
     }
     return amount;
 }
-double Rates::setLuxSeatRate(double changeAmountWindow, double changeAmount) {
+double Rates::GetDistance() //Method returns distance
+{
+    return this->distance;
+}
+double Rates::GetAmount() //Method returns amount
+{
+    return this->amount;
+}
+double Rates::setLuxSeatRate(double changeAmountWindow, double changeAmount) //Method sets Luxury Bus seat rates
+{
     LUXURYAISLEANDWINDOW = changeAmountWindow;
     LUXURYOTHER = changeAmount;
     return LUXURYAISLEANDWINDOW, LUXURYOTHER;
 }
 
-double Rates::setMiniBusSeatRate(double changeAmount) {
+double Rates::setMiniBusSeatRate(double changeAmount) //Method sets MiniBus seat rates
+{
     MINIBUSSEAT = changeAmount;
     return MINIBUSSEAT;
 }
 
-double Rates::setMiniVanSeatRate(double changeAmount) {
+double Rates::setMiniVanSeatRate(double changeAmount) //Method sets Minivan seat rates
+{
     MINIVANSEAT = changeAmount;
     return MINIVANSEAT;
 }
 
-double Rates::setLuxBusRate(double changeAmount, double mileCost, double secDeposit) {
+double Rates::setLuxBusRate(double changeAmount, double mileCost, double secDeposit) //Method sets Luxury bus hire rates
+{
     LUXURYBH[0] = changeAmount;
     LUXURYBH[1] = mileCost;
     LUXURYBH[2] = secDeposit;
@@ -243,7 +227,8 @@ double Rates::setLuxBusRate(double changeAmount, double mileCost, double secDepo
     return *LUXURYBH;
 }
 
-double Rates::setMiniBusRate(double changeAmount, double mileCost, double secDeposit) {
+double Rates::setMiniBusRate(double changeAmount, double mileCost, double secDeposit) //Method sets MiniBus bus hire rates
+{
     MINIBUSBH[0] = changeAmount;
     MINIBUSBH[1] = mileCost;
     MINIBUSBH[2] = secDeposit;
@@ -253,7 +238,8 @@ double Rates::setMiniBusRate(double changeAmount, double mileCost, double secDep
     return *MINIBUSBH;
 }
 
-double Rates::setMiniVanRate(double changeAmount, double mileCost, double secDeposit) {
+double Rates::setMiniVanRate(double changeAmount, double mileCost, double secDeposit) //Method sets Mini van bus hire rates
+{
     MINIVANBH[0] = changeAmount;
     MINIVANBH[1] = mileCost;
     MINIVANBH[2] = secDeposit;
@@ -263,83 +249,76 @@ double Rates::setMiniVanRate(double changeAmount, double mileCost, double secDep
     return *MINIVANBH;
 }
 
-double Rates::getLuxSeatRate() {
+double Rates::getLuxSeatRate() //Method returns Luxury bus "Other" seat  rate
+{
     return LUXURYOTHER;
 }
 
-double Rates::getLuxSeatRateWindow() {
+double Rates::getLuxSeatRateWindow() //Method returns Luxury bus window and aisle seat rate 
+{
     return LUXURYAISLEANDWINDOW;
 }
 
-double Rates::getMiniBussSeatRate() {
+double Rates::getMiniBussSeatRate() //Method returns Minibus seat rate
+{
     return MINIBUSSEAT;
 }
 
-double Rates::getMiniVanSeatRate() {
+double Rates::getMiniVanSeatRate() //Method returns Mini van seat rate
+{
     return MINIVANSEAT;
 }
 
 void Rates::SaveTransaction(Reservation Reservation, int Destination, int BusType, string Reason) //Writes transaction information to file
 {
-    try
+    fstream input;
+    
+    //Opens file containing transactions
+    input.open("./RatesInput.txt", ios::app);
+    
+    if (input.is_open()) //Only try to save to file if file opened properly
     {
-        fstream input;
-
-        //Opens file containing transactions
-        input.open("./RatesInput.txt", ios::app);
-
-        if (input.is_open()) //Only try to save to file if file opened properly
+        //Region calculates and stores necessary information into object transaction
+        Rates transaction = Rates();
+        transaction.name = Reservation.GetName();
+        transaction.day = Reservation.GetDateOfTravel();
+        transaction.distance = Distances[Destination];
+    
+        int* seats = Reservation.GetTickets();
+        int seatTickets = 0;
+        transaction.rate = this->GetRate(seats, BusType, Reservation.IsBusHire());
+        for (int i = 0; i < 5; i++)
         {
-            //Region calculates and stores necessary information into object transaction
-            Rates transaction = Rates();
-            transaction.name = Reservation.GetName();
-            transaction.day = Reservation.GetDateOfTravel();
-            transaction.distance = Distances[Destination];
-
-            int* seats = Reservation.GetTickets();
-            int seatTickets = 0;
-            transaction.rate = this->GetRate(seats, BusType, Reservation.IsBusHire());
-            for (int i = 0; i < 5; i++)
-            {
-                seatTickets += seats[i];
-            }
-            transaction.tickets = seatTickets;
-            transaction.rentalFee = this->GetRentalFee(Reservation.IsBusHire(), BusType);
-            transaction.deposit = this->GetDeposit(Reservation.IsBusHire(), BusType);
-            transaction.penalty = this->GetPenalty(Reservation.GetDateOfTravel(), Reason);
-            transaction.reason = Reason;
-            transaction.amount = this->GetAmount(transaction, Reservation.IsBusHire(), BusType);
-            //End region for calculating and saving necessary information into object transaction
-
-            //writes the data gathered above into the file
-            input << transaction.name << endl;
-            input << transaction.day.toString() << endl;
-            input << transaction.distance << endl;
-            input << transaction.rate << endl;
-            input << transaction.tickets << endl;
-            input << transaction.rentalFee << endl;
-            input << transaction.deposit << endl;
-            input << transaction.penalty << endl;
-            input << transaction.amount << endl;
-            input << transaction.reason << endl;
-
-            //closes the file
-            input.close();
-
-            this->PrintTransaction(transaction);
+            seatTickets += seats[i];
         }
-        else
-        {
-            cout << "There has been an error saving the transaction. Please try again later.\n\n";
-        }
-    }
-    catch (exception e)
-    {
-        cout << "There has been an error saving the transaction. Please try again later.\n\n";
+        transaction.tickets = seatTickets;
+        transaction.rentalFee = this->GetRentalFee(Reservation.IsBusHire(), BusType);
+        transaction.deposit = this->GetDeposit(Reservation.IsBusHire(), BusType);
+        transaction.penalty = this->GetPenalty(Reservation.GetDateOfTravel(), Reason);
+        transaction.reason = Reason;
+        transaction.amount = this->GetAmount(transaction, Reservation.IsBusHire(), BusType);
+        //End region for calculating and saving necessary information into object transaction
+    
+        //writes the data gathered above into the file
+        input << transaction.name << endl;
+        input << transaction.day.toString() << endl;
+        input << transaction.distance << endl;
+        input << transaction.rate << endl;
+        input << transaction.tickets << endl;
+        input << transaction.rentalFee << endl;
+        input << transaction.deposit << endl;
+        input << transaction.penalty << endl;
+        input << transaction.amount << endl;
+        input << transaction.reason << endl;
+    
+        //closes the file
+        input.close();
+    
+        this->PrintTransaction(transaction);
     }
 }
 
-bool Rates::FindTransaction(string Name, Date Day, string Reason)
+bool Rates::FindTransaction(string Name, Date Day, string Reason) //Method finds transaction using arguments, if found, return true, else return false
 {
     bool isFound = false;
 
@@ -387,7 +366,6 @@ bool Rates::FindTransaction(string Name, Date Day, string Reason)
     }
     else
     {
-        cout << "There has been an issue trying to access the file with the records. Please try again later\n\n";
         isFound = false;
     }
 
@@ -396,69 +374,45 @@ bool Rates::FindTransaction(string Name, Date Day, string Reason)
 
 }
 
-Rates Rates::GetTransaction(string Name, Date Day, string Reason) //Reads the transaction information from a file
+void Rates::GetTransaction(string Name, Date Day, string Reason) //Method reads the transaction information from a file and stores it in current object
 {
-    try
+    
+    ifstream output;
+    
+    //Opens file containing transactions
+    output.open("./RatesInput.txt", ios::in);
+    if (output.is_open()) //Only try to read from file if file opened properly
     {
-        ifstream output;
-
-        //Opens file containing transactions
-        output.open("./RatesInput.txt", ios::in);
-        if (output.is_open()) //Only try to read from file if file opened properly
+        Rates transaction = Rates();
+        string Day2;
+        transaction.distance = -1; //Sets distance to -1 for error checking
+    
+        while (getline(output, transaction.name)) //Gets name on the transaction 
         {
-            Rates transaction = Rates();
-
-            //variables section for temporarily storing the data read from the file
-            string Name2;
-            string Day2;
-            double Distance = -1;   //Set to -1 as a check for if the transaction is not found
-            double Rate;
-            int Tickets;
-            double RentalFee;
-            double Deposit;
-            double Penalty;
-            double Amount;
-            string Reason2;
-
-            while (getline(output, Name2)) //Gets name on the transaction 
+            //Gets string objects from file using getline() and other objects directly through >> 
+            //to prevent memory access violations sometimes caused by reading strings
+            getline(output, Day2);
+            output >> transaction.distance >> transaction.rate >> transaction.tickets >> transaction.rentalFee 
+                >> transaction.deposit >> transaction.penalty >> transaction.amount;
+            getline(output, transaction.reason); //getline buffer because switching between getting a number and a string 
+            getline(output, transaction.reason); //adds a blank line when reading from file
+    
+            //If passed name, day, and reason for transaction are the same, the record is found and print the record
+            if (transaction.name.compare(Name) == 0 && Day2.compare(Day.toString()) == 0 && transaction.reason.compare(Reason) == 0)
             {
-                //Gets string objects from file using getline() and other objects directly through >> 
-                //to prevent memory access violations sometimes caused by reading strings
-                getline(output, Day2);
-                output >> Distance >> Rate >> Tickets >> RentalFee >> Deposit >> Penalty >> Amount;
-                getline(output, Reason2); //getline buffer because switching between getting a number and a string adds a blank line when reading from file
-                getline(output, Reason2);
-
-                //If passed name, day, and reason for transaction are the same, the record is found and print the record
-                if (Name2.compare(Name) == 0 && Day2.compare(Day.toString()) == 0 && Reason2.compare(Reason) == 0)
-                {
-                    transaction.name = Name;
-                    transaction.day = Day;
-                    transaction.distance = Distance;
-                    transaction.rate = Rate;
-                    transaction.tickets = Tickets;
-                    transaction.rentalFee = RentalFee;
-                    transaction.deposit = Deposit;
-                    transaction.penalty = Penalty;
-                    transaction.amount = Amount;
-                    transaction.reason = Reason;
-                    break; //break when record is found
-                }
+                transaction.day = Day;
+                *this = transaction;
+                break; //break when record is found
             }
-
-            //closes the file
-            output.close();
-
-            return transaction;
         }
-    }
-    catch(exception e)
-    {
-        cout << "Sorry, there has been an issue accessing the file with your records. Please try again later.\n\n";
+    
+        //closes the file
+        output.close();
+    
     }
 }
 
-void Rates::PrintTransaction(Rates Transaction)
+void Rates::PrintTransaction(Rates Transaction) //Prints the transaction
 {
     cout << "Transaction Details\n\n"
         << "Name: " << Transaction.name << "\n"
@@ -471,4 +425,173 @@ void Rates::PrintTransaction(Rates Transaction)
         << "Tax: " << (int)((Transaction.tax - 1) * 100) << "%\n"
         << "Amount: $" << Transaction.amount << "\n"
         << "Reason: " << Transaction.reason << "\n\n";
+}
+
+void Rates::CheckWeeklySales(Date date) //Prints total weekly sales
+{
+    cout << "Total Sales During Week of " << date.toString() << "\n\n";
+    double refunds = 0;
+    double purchases = 0;
+
+    for (int i = 0; i < 6; i++)
+    {
+        ifstream output;
+
+        //Opens file containing transactions
+        output.open("./RatesInput.txt", ios::in);
+        if (output.is_open()) //Only try to read from file if file opened properly
+        {
+            Rates transaction = Rates();
+            string Day2;
+            transaction.distance = -1; //Sets distance to -1 for error checking
+
+            while (getline(output, transaction.name)) //Gets name on the transaction 
+            {
+                //Gets string objects from file using getline() and other objects directly through >> 
+                //to prevent memory access violations sometimes caused by reading strings
+                getline(output, Day2);
+                output >> transaction.distance >> transaction.rate >> transaction.tickets >> transaction.rentalFee
+                    >> transaction.deposit >> transaction.penalty >> transaction.amount;
+                getline(output, transaction.reason); //getline buffer because switching between getting a number and a string 
+                getline(output, transaction.reason); //adds a blank line when reading from file
+
+                if (Day2.compare(date.toString()) == 0)
+                {
+                    (transaction.amount > 0) ? purchases += (transaction.amount - transaction.deposit) : refunds += transaction.amount;
+                }
+            }
+
+            //closes the file
+            output.close();
+
+        }
+        date.nextDay();
+    }
+    cout << "Total Purchases: " << purchases << "\n"
+        << "Total Refunds: " << refunds << "\n"
+        << "Net Total: " << purchases + refunds << "\n\n";
+}
+
+void Rates::ChangeTransactionName(Reservation Reservation, string NewName) //Overwrites transaction with new name
+{
+    ifstream output;
+    
+    output.open("./RatesInput.txt", ios::in);
+    
+    ofstream input;
+    
+    input.open("./RatesTemp.txt", ios::out);
+    
+    if (output.is_open())
+    {
+        Rates transaction = Rates();
+        string Day2;
+        transaction.distance = -1; //Sets distance to -1 for error checking
+    
+        while (getline(output, transaction.name)) //Gets name on the transaction 
+        {
+            //Gets string objects from file using getline() and other objects directly through >> 
+            //to prevent memory access violations sometimes caused by reading strings
+            getline(output, Day2);
+            output >> transaction.distance >> transaction.rate >> transaction.tickets >> transaction.rentalFee
+                >> transaction.deposit >> transaction.penalty >> transaction.amount;
+            getline(output, transaction.reason); //getline buffer because switching between getting a number and a string 
+            getline(output, transaction.reason); //adds a blank line when reading from file
+    
+            if (transaction.name.compare("") != 0 && !(transaction.name.compare(Reservation.GetName()) == 0 && Day2.compare(Reservation.GetDateOfTravel().toString()) == 0))
+            {
+                input << transaction.name << endl;
+                input << transaction.day.toString() << endl;
+                input << transaction.distance << endl;
+                input << transaction.rate << endl;
+                input << transaction.tickets << endl;
+                input << transaction.rentalFee << endl;
+                input << transaction.deposit << endl;
+                input << transaction.penalty << endl;
+                input << transaction.amount << endl;
+                input << transaction.reason << endl;
+            }
+            else
+            {
+                input << NewName << endl;
+                input << transaction.day.toString() << endl;
+                input << transaction.distance << endl;
+                input << transaction.rate << endl;
+                input << transaction.tickets << endl;
+                input << transaction.rentalFee << endl;
+                input << transaction.deposit << endl;
+                input << transaction.penalty << endl;
+                input << transaction.amount << endl;
+                input << transaction.reason << endl;
+            }
+        }
+    }
+    
+    input.close();
+    output.close();
+    remove("./RatesInput.txt");
+    rename("./RatesTemp.txt", "./RatesInput.txt");
+}
+
+void Rates::ChangeReservationCharge(Reservation Reservation, double Amount) //Overwrites transaction with new amount
+{
+    ifstream output;
+
+    output.open("./RatesInput.txt", ios::in);
+
+    ofstream input;
+
+    input.open("./RatesTemp.txt", ios::out);
+
+    if (output.is_open())
+    {
+        Rates transaction = Rates();
+        string Day2;
+        transaction.distance = -1; //Sets distance to -1 for error checking
+
+        while (getline(output, transaction.name)) //Gets name on the transaction 
+        {
+            //Gets string objects from file using getline() and other objects directly through >> 
+            //to prevent memory access violations sometimes caused by reading strings
+            getline(output, Day2);
+            output >> transaction.distance >> transaction.rate >> transaction.tickets >> transaction.rentalFee
+                >> transaction.deposit >> transaction.penalty >> transaction.amount;
+            getline(output, transaction.reason); //getline buffer because switching between getting a number and a string 
+            getline(output, transaction.reason); //adds a blank line when reading from file
+
+            if (transaction.name.compare("") != 0 && !(transaction.name.compare(Reservation.GetName()) == 0 && Day2.compare(Reservation.GetDateOfTravel().toString()) == 0))
+            {
+                input << transaction.name << endl;
+                input << transaction.day.toString() << endl;
+                input << transaction.distance << endl;
+                input << transaction.rate << endl;
+                input << transaction.tickets << endl;
+                input << transaction.rentalFee << endl;
+                input << transaction.deposit << endl;
+                input << transaction.penalty << endl;
+                input << transaction.amount << endl;
+                input << transaction.reason << endl;
+            }
+            else
+            {
+                input << transaction.name << endl;
+                input << transaction.day.toString() << endl;
+                input << transaction.distance << endl;
+                input << transaction.rate << endl;
+                input << transaction.tickets << endl;
+                input << transaction.rentalFee << endl;
+                input << transaction.deposit << endl;
+                input << transaction.penalty << endl;
+                input << Amount << endl;
+                input << transaction.reason << endl;
+            }
+        }
+        cout << "Reservation charge successfully changed.\n\n";
+    }
+
+    input.close();
+    output.close();
+    remove("./RatesInput.txt");
+    rename("./RatesTemp.txt", "./RatesInput.txt");
+
 }
