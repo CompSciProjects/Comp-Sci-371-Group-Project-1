@@ -1,5 +1,7 @@
 #ifndef ADMINISTRATION_H
 #define ADMINISTRATION_H
+#include "Date.h"
+using namespace std;
 
 class Admin
 {
@@ -15,5 +17,9 @@ private:
 public:
 	//reference to all methods from Administration.cpp
 	void AdminMenu();
+	void AddVehicles();
+	void EditReservation(Date date);
+	void ChangeReservationCharge();
+	Date EnterDate();
 };
 #endif
