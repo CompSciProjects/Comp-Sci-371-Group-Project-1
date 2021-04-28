@@ -1,3 +1,4 @@
+#include "Administration.h"
 #include "Reservation.h"
 #include "Rates.h"
 #include "Scheduling.h"
@@ -6,40 +7,19 @@
 #include <time.h>
 using namespace std;
 
-/*Passengers  can  reserve  seats  2  weeks  in  advance.  
-Reservation  requires passenger’s biographical information  including
-name,  address,  contact  number,  email  address,  date  of  travel  and  how  many  tickets.  
-Passengers  can  cancel  reservation  one  week  before  the  travel  however  any  cancellation  
-shorter  than  a  week  will  require  30%  penalty.
-If  a  passenger  wants  to  cancel  reservation  one  day  before the trave including one minute 
-before the travel will forfeit the entire cost of the ticket. 
-If the travel is cancelled by the company, passengers will get full refund. 
-The company reserves the rights to  cancel  any  travel  with  prior  notice  at  2  days  ahead  of  the  journey.  
-The  company  can  reject  any  travel  at  its  discretion.  All  kinds  of  reservation  need  to  store  in  
-permanent  file(s)  so  that  they  can  retrieve later for administration tasks.*/
-
-/*The inventory of buses is available for hire for recreational purpose.
-Once a customer requests for a bus hire, your responsibility is to check the inventory
-of the buses available from the location on the particular  date  requested.  Remember,
-bus  hire  is  always  profitable  since  you  can  charge  for  the  all  seats  available  in  the  bus.
-So  if  the  number  of  reservations  for  that  bus  is  not  half  full  on  that  particular date,
-it is always better to allow for bus hire. The reserving customer hiring the bus should enter  the  same
-biographical  information  as  for  normal  ticket  reservation.
-All  kinds  of  information  regarding  the   hire   needs   to   store   permanently   in   file(s)
-so   that   they   can   retrieve   later   for   administration tasks.*/
 string months[12] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
-string Reservation::GetName()
+string Reservation::GetName() //Returns reservation name
 {
 	return this->name;
 }
 
-string Reservation::getBusName()
+string Reservation::getBusName() //Returns bus name
 {
 	return this->busType;
 }
 
-void Reservation::SetDateOfTravel()
+void Reservation::SetDateOfTravel() //sets reservation date
 {
 	int Month;
 	int Day;
@@ -48,7 +28,6 @@ void Reservation::SetDateOfTravel()
 	localtime_s(&tm, &ttime);
 	Date CurrentDate(1 + tm.tm_mon, tm.tm_mday, 1900 + tm.tm_year);
 	int CurrentMonth = tm.tm_mon + 1;
-
 
 	int threeMonths = tm.tm_mon + 3;
 	if ((CurrentMonth == 2 && tm.tm_mday > 14) || (CurrentMonth != 2 && tm.tm_mday > 16))
@@ -84,6 +63,8 @@ void Reservation::SetDateOfTravel()
 		{
 			cout << "The month you entered is not valid.\n"
 				<< "Please enter the month in which you want to travel corresponding to the numbers above: ";
+			cin.clear();
+			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			cin >> Month;
 		}
 	}
@@ -112,6 +93,8 @@ void Reservation::SetDateOfTravel()
 			{
 				cout << "The day you entered is not valid.\n"
 					<< "Please enter the day you wish to travel in " << months[Month-1] << ": ";
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				cin >> Day;
 
 				DaysBefore = this->DateValidation(Date(Month, Day, year));
@@ -128,6 +111,8 @@ void Reservation::SetDateOfTravel()
 			{
 				cout << "The day you entered is not valid.\n"
 					<< "Please enter the day you wish to travel in " << months[Month - 1] << ": ";
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				cin >> Day;
 
 				DaysBefore = this->DateValidation(Date(Month, Day, year));
@@ -145,20 +130,25 @@ void Reservation::SetDateOfTravel()
 			leapYear = false;
 		}
 
-		if (Day < 0 || (leapYear) ? Day > 29 : Day > 28 || DaysBefore < 14)
+		if (Day < 1 || ((leapYear) ? Day > 29 : Day > 28) || DaysBefore < 14)
 		{
-			while (Day < 0 || (leapYear) ? Day > 29 : Day > 28 || DaysBefore < 14)
+			while (Day < 1 || ((leapYear) ? Day > 29 : Day > 28) || DaysBefore < 14)
 			{
 				cout << "The day you entered is not valid.\n"
 					<< "Please enter the day you wish to travel in " << months[Month - 1] << ": ";
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				cin >> Day;
 
 				DaysBefore = this->DateValidation(Date(Month, Day, year));
 			}
 		}
 		break;
+	default:
+		cin.clear();
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		break;
 	}
-
 
 	this->dateOfTravel.SetMonth(Month);
 	this->dateOfTravel.SetDay(Day);
@@ -171,17 +161,17 @@ void Reservation::SetDateOfTravel()
 	tm.tm_year = changeYear;
 }
 
-Date Reservation::GetDateOfTravel()
+Date Reservation::GetDateOfTravel() //returns date of travel
 {
 	return this->dateOfTravel;
 }
 
-int Reservation::DateValidation(Date date)
+int Reservation::DateValidation(Date date) //Validates if date is greater than two weeks out
 {
 	int DaysBefore;
 	Date Current(1 + tm.tm_mon, tm.tm_mday, 1900 + tm.tm_year);
 
-	//Checks if trip is within 14 of now 
+	//Checks if trip is within 14 days from now 
 	for (DaysBefore = 0; DaysBefore < 14; DaysBefore++)
 	{
 		if (Current.toString().compare(date.toString()) == 0)
@@ -193,27 +183,22 @@ int Reservation::DateValidation(Date date)
 	return DaysBefore;
 }
 
-struct tm Reservation::GetWeekNum()
-{
-	return tm;
-}
-
-int Reservation::GetDestination(string Destination)
+int Reservation::GetDestination(string Destination) //Returns destination number, corresponding to distances array in rates
 {
 	int DestinationNum;
-	if (Destination.compare(Destinations[0]) == 0)
+	if (Destination.compare(Destinations[0]) == 0 || Destination.compare(Destinations[5]) == 0)
 	{
 		DestinationNum = 0;
 	}
-	else if (Destination.compare(Destinations[1]) == 0)
+	else if (Destination.compare(Destinations[1]) == 0 || Destination.compare(Destinations[6]) == 0)
 	{
 		DestinationNum = 1;
 	}
-	else if (Destination.compare(Destinations[2]) == 0)
+	else if (Destination.compare(Destinations[2]) == 0 || Destination.compare(Destinations[7]) == 0)
 	{
 		DestinationNum = 2;
 	}
-	else if (Destination.compare(Destinations[3]) == 0)
+	else if (Destination.compare(Destinations[3]) == 0 || Destination.compare(Destinations[8]) == 0)
 	{
 		DestinationNum = 3;
 	}
@@ -224,7 +209,7 @@ int Reservation::GetDestination(string Destination)
 	return DestinationNum;
 }
 
-int Reservation::GetBusType(string BusType)
+int Reservation::GetBusType(string BusType) //returns bus type corresponding to bustypes array 
 {
 	int BusTypeNum;
 	if (BusType.compare(BusTypes[0]) == 0)
@@ -242,96 +227,126 @@ int Reservation::GetBusType(string BusType)
 	return BusTypeNum;
 }
 
-int* Reservation::GetTickets()
+int* Reservation::GetTickets() //returns tickets
 {
 	return this->tickets;
 }
 
-bool Reservation::IsBusHire()
+int Reservation::GetSeatType(char Seat) //returns number correstponding to seat types array
+{
+	int SeatType;
+	if (Seat == SeatTypes[0])
+	{
+		SeatType = 0;
+	}
+	else if (Seat == SeatTypes[1])
+	{
+		SeatType = 1;
+	}
+	else if (Seat == SeatTypes[2])
+	{
+		SeatType = 2;
+	}
+	else if (Seat == SeatTypes[3])
+	{
+		SeatType = 3;
+	}
+	else
+	{
+		SeatType = 4;
+	}
+	return SeatType;
+}
+
+bool Reservation::IsBusHire() //Returns bus hire status
 {
 	return this->isBusHire;
 }
 
-void Reservation::CustomerMenu()
+void Reservation::CustomerMenu() //Customer selection menu
 {
-	int option = 0;
-
-	cout << "Customer Menu";
-
-	//Allows the user to choose an Admin task or exit the Admin menu
-	while (option != 4)
+	try
 	{
-		cout << "\n\n1. Reserve seat(s)\n"
-			<< "2. Hire a bus\n"
-			<< "3. Cancel Reservation\n"
-			<< "4. Exit\n"
-			<< "Please select an option 1 through 4:";
-		cin >> option;
-		cout << "\n";
+		int option = 0;
 
-		switch (option)
+		cout << "Customer Menu";
+
+		//Allows the user to choose an Customer task or exit the Customer menu
+		while (option != 4)
 		{
-		case 1:
-			this->SeatReservation();
-			break;
-		case 2:
-			this->BusHire();
-			break;
-		case 3:
-			this->CancelReservation();
-			break;
-		case 4:
-			cout << "Exiting the Customer Menu. Redirecting back to main menu.\n\n";
-			break;
-		default:
-			cout << "That is not a valid option.\n\n";
-			break;
+			cout << "\n\n1. Reserve seat(s)\n"
+				<< "2. Hire a bus\n"
+				<< "3. Cancel Reservation\n"
+				<< "4. Exit\n"
+				<< "Please select an option 1 through 4:";
+			cin >> option;
+			cout << "\n";
+
+			switch (option)
+			{
+			case 1:
+				this->SeatReservation();
+				break;
+			case 2:
+				this->BusHire();
+				break;
+			case 3:
+				this->CancelReservation();
+				break;
+			case 4:
+				cout << "Exiting the Customer Menu. Redirecting back to main menu.\n\n";
+				break;
+			default:
+				cout << "That is not a valid option.\n\n";
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				break;
+			}
 		}
+	}
+	catch (exception e)
+	{
+		cout << "Sorry, an unexpected error occured. Redirecting back to the main menu.\n\n";
 	}
 }
 
-void Reservation::SetGeneralReservationInfo()
+void Reservation::SetGeneralReservationInfo() //Sets generic info for both normal seat reservations and bus hires
 {
-	string Name;
-	string Address;
-	string ContactNumber;
-	string Email;
 	int Destination;
 	int BusType;
 
 	cout << "Please enter your full name: ";
 	cin.ignore();
-	getline(cin, Name);
+	getline(cin, this->name);
 
 	cout << "Please enter your address: ";
 	cin.ignore(0, EOF);
-	getline(cin, Address);
+	getline(cin, this->address);
 
 	cout << "Please enter your phone number: ";
 	cin.ignore(0, EOF);
-	getline(cin, ContactNumber);
+	getline(cin, this->contactNumber);
 
 	cout << "Please enter your email address: ";
 	cin.ignore(0, EOF);
-	getline(cin, Email);
+	getline(cin, this->email);
 
 	this->SetDateOfTravel();
 	
 	cout << "\n\n";
 
-	//THIS SECTION IS ONLY TO TEMPORARILY FILL THE TRIP DETAIL VARIABLES
-	//ONCE THE SCHEDULING SECTION IS COMPLETE, THE FUNCTIONS FROM SCHEDULING WILL
-	//BE USED TO DETERMINE AVAILABILITY OF BUSSES AND DESTINATIONS
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		cout << i + 1 << ". " << Destinations[i] << "\n";
 	}
-	cout << "Please enter which destination you would like to go to on " << this->dateOfTravel.toString() << ": ";
+	cout << "\nPlease enter which destination you would like to go to on " << this->dateOfTravel.toString() << ": ";
 	cin >> Destination;
-	while (Destination < 1 || Destination > 5)
+	while (Destination < 1 || Destination > 10)
 	{
-		cout << "That is not a valid destination. Valid destinations are 1 through 5.\n"
+		cout << "\nThat is not a valid destination. Valid destinations are 1 through 10.\n"
 			<< "Please enter which destination you would like to go to on " << this->dateOfTravel.toString() << ": ";
+		cin.clear();
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		cin >> Destination;
 	}
 	Destination--;
@@ -341,26 +356,23 @@ void Reservation::SetGeneralReservationInfo()
 	{
 		cout << i + 1 << ". " << BusTypes[i] << "\n";
 	}
-	cout << "Please enter which bus type you would like to use: ";
+	cout << "\nPlease enter which bus type you would like to use: ";
 	cin >> BusType;
 	while (BusType < 1 || BusType > 3)
 	{
 		cout << "That is not a valid bus type. Valid bus types are 1 through 3.\n"
 			<< "Please enter which bus type you would like to use: ";
+		cin.clear();
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		cin >> BusType;
 	}
 	BusType--;
-	//END SECTION
 
-	this->name = Name;
-	this->address = Address;
-	this->contactNumber = ContactNumber;
-	this->email = Email;
 	this->destination = Destinations[Destination];
 	this->busType = BusTypes[BusType];
 }
 
-void Reservation::SeatReservation()
+void Reservation::SeatReservation() //Seat reservation section
 {
 	this->SetGeneralReservationInfo();
 
@@ -368,21 +380,138 @@ void Reservation::SeatReservation()
 
 	int BusType = this->GetBusType(busType);
 
-	int seats[] = { 3,0,4,0,0 }; //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-
-	this->tickets = new int[5];  //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-	for (int i = 0; i < 5; i++)	
+	int Tickets;
+	cout << "\nPlease enter about how many tickets you want: ";
+	cin >> Tickets;
+	while (Tickets < 1 || Tickets > 12)
 	{
-		this->tickets[i] = seats[i];
-	}							//END SECTION
-	this->isBusHire = false;
+		cout << "That is too many tickets for reservation.\n"
+			<< "\nPlease enter about how many tickets you want: ";
+		cin.clear();
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		cin >> Tickets;
+	}
 
-	this->SaveReservation();
+	Scheduling trip = Scheduling();
+	if (trip.getTrip(destination, busType, dateOfTravel, Tickets))
+	{
+		this->busID = trip.getBusID();
+		Tickets = 0;
+		int Seats[] = { 0,0,0,0,0 }; 
+		int input = -1;
+		char input2;
+		int row;
+		int col;
 
-	Rates().SaveTransaction(*this, Destination, BusType, Reasons[0]);
+		while (input != 0)
+		{
+			cout << "\n";
+			trip.printSeatArray();
+			cout << "0. Exit\n"
+				<< "Please select which row you woud like a ticket in, or select 0 to exit selection: ";
+			cin >> input;
+
+			if (input == 0)
+			{
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				break;
+			}
+			else if (input < 0 || (BusType == 0) ? input > 11 : (BusType == 1) ? input > 12 : input > 4)
+			{
+				while (input < 0 || (BusType == 0) ? input > 11 : (BusType == 1) ? input > 12 : input > 4)
+				{
+					cout << "That selection is not valid.\n"
+						<< "Please select which row you woud like a ticket in, or select 0 to exit selection: ";
+					cin >> input;
+					if (input == 0)
+					{
+						break;
+					}
+				}
+			}
+			row = input;
+			trip.printSeatRow(row);
+
+			cout << "Open seats are marked by 'O' and taken seats are marked by 'X'\n";
+			cout << "Please enter the letter corresponding to the seat you would like, or enter 0 to exit: ";
+			cin >> input2;
+
+			if (input2 != '0' && toupper(input2) != 'A' && toupper(input2) != 'B' && toupper(input2) != 'E' && toupper(input2) != 'D' && toupper(input2) != 'C')
+			{
+				cout << "That entry is not valid. Redirecting to the seat display menu.\n\n";
+			}
+			else if (input2 == '0')
+			{
+				cout << "\n\n";
+				input = 0;
+			}
+			else
+			{
+				col = this->GetSeatType(toupper(input2));
+				char seat = trip.getSeat(row, col);
+				if (seat == 'O')
+				{
+					this->seats[Tickets][0] = row-1;
+					this->seats[Tickets][1] = col;
+					Tickets++;
+					Seats[col]++;
+					trip.setSeat(row, col);
+				}
+				else
+				{
+					cout << "That selection is not valid.\n\n";
+				}
+			}
+		}
+
+		this->tickets = new int[5];  
+		for (int i = 0; i < 5; i++)	
+		{
+			this->tickets[i] = Seats[i];
+		}							
+		this->isBusHire = false;
+
+		if (Tickets > 0)
+		{
+			cout << "\n\nPlease confirm you would like to make this reservation.\n"
+				<< "1. Yes\n"
+				<< "2. No\n";
+			cin >> input;
+			while (input != 1 && input != 2)
+			{
+				cout << "That is not a valid entry.\n\n"
+					<< "Please confirm you would like to make this reservation.\n"
+					<< "1. Yes\n"
+					<< "2. No\n";
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				cin >> input;
+			}
+		}
+
+		if (input == 1 && Tickets > 0)
+		{
+			trip.saveTrip();
+			this->SaveReservation();
+		
+			Rates().SaveTransaction(*this, Destination, BusType, Reasons[0]);
+
+			cout << "Reservation has been confirmed. Redirecting to Customer menu.\n\n";
+		}
+		else
+		{
+			cout << "Reservation has been cancelled. Redirecting to the customer menu.\n\n";
+		}
+	}
+	else
+	{
+		cout << "\n\nSorry, there are no buses available for your desired trip.\n\n";
+	}
+	
 }
 
-void Reservation::BusHire()
+void Reservation::BusHire() //Bus hire section
 {
 	this->SetGeneralReservationInfo();
 
@@ -390,42 +519,116 @@ void Reservation::BusHire()
 
 	int BusType = this->GetBusType(busType);
 
-
-	int seats[] = { 3,0,4,0,0 }; //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-
-	this->tickets = new int[5];
-	for (int i = 0; i < 5; i++)	//THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+	int Tickets;
+	if (BusType == 0)
 	{
-		this->tickets[i] = seats[i];
-	}							//END SECTION
-	this->isBusHire = true;
+		Tickets = 27;
+	}
+	else if (BusType == 1)
+	{
+		Tickets = 19;
+	}
+	else
+	{
+		Tickets = 7;
+	}
 
-	this->SaveReservation();
+	Scheduling trip = Scheduling();
+	if (trip.getTrip(destination, busType, dateOfTravel, Tickets))
+	{
+		this->busID = trip.getBusID();
+		Tickets = 0;
+		int Seats[] = { 0,0,0,0,0 }; 
+		
+		for (int i = 0; i < 12; i++)
+		{
+			for (int j = 0; j < 5; j++)
+			{
+				if (trip.getSeat(i + 1, j) == 'O')
+				{
+					this->seats[Tickets][0] = i;
+					this->seats[Tickets][1] = j;
+					Tickets++;
+					Seats[j]++;
+					trip.setSeat(i + 1, j);
+				}
+			}
+		}
 
-	Rates().SaveTransaction(*this, Destination, BusType, Reasons[1]);
+		this->tickets = new int[5];
+		for (int i = 0; i < 5; i++)	
+		{
+			this->tickets[i] = Seats[i];
+		}							
+		this->isBusHire = true;
 
+		int input;
+		cout << "\n\nPlease confirm you would like to make this reservation.\n"
+			<< "1. Yes\n"
+			<< "2. No\n";
+		cin >> input;
+		while (input != 1 && input != 2)
+		{
+			cout << "That is not a valid entry.\n\n"
+				<< "Please confirm you would like to make this reservation.\n"
+				<< "1. Yes\n"
+				<< "2. No\n";
+			cin.clear();
+			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			cin >> input;
+		}
+
+		if (input == 1 && Tickets > 0)
+		{
+			trip.saveTrip();
+			this->SaveReservation();
+
+			Rates().SaveTransaction(*this, Destination, BusType, Reasons[1]);
+
+			cout << "Reservation has been confirmed. Redirecting to Customer menu.\n\n";
+		}
+		else
+		{
+			cout << "Reservation has been cancelled. Redirecting to the customer menu.\n\n";
+		}
+	}
+	else
+	{
+		cout << "\n\nSorry, there are no buses available for your desired trip.\n\n";
+	}
 }
 
-void Reservation::CancelReservation()
+void Reservation::CancelReservation() //Cancels reservation
 {
 	string Name;
 	int Month;
 	int Day;
 	int Year = 2021;
+	time_t ttime = time(0);
+	localtime_s(&tm, &ttime);
+	Year = 1900 + tm.tm_year;
 
 	cout << "Please enter the name under the reservation: ";
 	cin.ignore();
 	getline(cin, Name);
 
-	cout << "Please enter the month of the reservation as a number (Ex. If April, you enter: 4)";
-	cin >> Month;
-
-	cout << "Please enter the day of the reservation: ";
-	cin >> Day;
-	Date date = Date(Month, Day, Year);
+	Date date = Admin().EnterDate();
 	if (Reservation().FindReservation(Name, date) && (Rates().FindTransaction(Name, date, Reasons[0]) || Rates().FindTransaction(Name, date, Reasons[1])))
 	{
 		Reservation reservation = Reservation().GetReservation(Name, date);
+
+		Scheduling trip = Scheduling();
+		trip.findTrip(reservation.busID, reservation.destination, reservation.busType, reservation.dateOfTravel);
+
+		for (int i = 0; i < 52; i++)
+		{
+			if (reservation.seats[i][0] != -1)
+			{
+				trip.resetSeat(reservation.seats[i][0] + 1, reservation.seats[i][1]);
+			}
+		}
+
+		trip.saveTrip();
 
 		Rates().SaveTransaction(reservation, reservation.GetDestination(reservation.destination), reservation.GetBusType(reservation.busType), Reasons[2]);
 
@@ -440,84 +643,77 @@ void Reservation::CancelReservation()
 
 void Reservation::SaveReservation()
 {
-	try
+	fstream input;
+
+	//Opens file containing transactions
+	input.open("./ReservationInput.txt", ios::app);
+
+	if (input.is_open()) //Only try to save to file if file opened properly
 	{
-		fstream input;
-
-		//Opens file containing transactions
-		input.open("./ReservationInput.txt", ios::app);
-
-		if (input.is_open()) //Only try to save to file if file opened properly
+		//writes the data gathered above into the file
+		input << this->name << endl;
+		input << this->address << endl;
+		input << this->contactNumber << endl;
+		input << this->email << endl;
+		input << this->dateOfTravel.toString() << endl;
+		input << this->destination << endl;
+		input << this->busType << endl;
+		input << this->busID << endl;
+		for (int i = 0; i < 52; i++)
 		{
-			//writes the data gathered above into the file
-			input << this->name << endl;
-			input << this->address << endl;
-			input << this->contactNumber << endl;
-			input << this->email << endl;
-			input << this->dateOfTravel.toString() << endl;
-			input << this->destination << endl;
-			input << this->busType << endl;
-			for (int i = 0; i < 5; i++)			//THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-			{
-				input << this->tickets[i] << endl;
-			}									//END SECTION
-			input << this->isBusHire << endl;
-
-			//closes the file
-			input.close();
-
-			this->PrintReservation(*this);
+			input << this->seats[i][0] << endl;
+			input << this->seats[i][1] << endl;
 		}
-		else
+		for (int i = 0; i < 5; i++)		
 		{
-			cout << "There has been an error saving the transaction. Please try again later.\n\n";
-		}
+			input << this->tickets[i] << endl;
+		}									
+		input << this->isBusHire << endl;
+
+		input.close();
+
+		this->PrintReservation();
 	}
-	catch (exception e)
+	else
 	{
 		cout << "There has been an error saving the transaction. Please try again later.\n\n";
 	}
 }
 
-bool Reservation::FindReservation(string Name, Date Day)
+bool Reservation::FindReservation(string Name, Date Day) //Finds reservation returns true if found, and false if found
 {
 	bool isFound = false;
 
 	ifstream output;
 
-	//Opens file containing transactions
 	output.open("./ReservationInput.txt", ios::in);
-	if (output.is_open()) //Only try to read from file if file opened properly
+	if (output.is_open()) 
 	{
-		//variables section for temporarily storing the data read from the file
-		string Name2;
-		string Address;
-		string ContactNumber;
-		string Email;
+		Reservation reservation = Reservation();
 		string DateOfTravel;
-		string Destination;
-		string BusType;
-		int* Tickets = new int[5]; //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-		bool IsBusHire;
 
-		while (getline(output, Name2)) //Gets name on the transaction 
+		while (getline(output, reservation.name))  
 		{
-			//Gets string objects from file using getline() and other objects directly through >> 
-			//to prevent memory access violations sometimes caused by reading strings
-			getline(output, Address);
-			getline(output, ContactNumber);
-			getline(output, Email);
+			getline(output, reservation.address);
+			getline(output, reservation.contactNumber);
+			getline(output, reservation.email);
 			getline(output, DateOfTravel);
-			getline(output, Destination);
-			getline(output, BusType);
-			for (int i = 0; i < 5; i++)	//THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+			getline(output, reservation.destination);
+			getline(output, reservation.busType);
+			output >> reservation.busID;
+			for (int i = 0; i < 52; i++)
 			{
-				output >> Tickets[i];
-			}							//END SECTION
-			output >> IsBusHire;
+				output >> reservation.seats[i][0];
+				output >> reservation.seats[i][1];
+			}
+			for (int i = 0; i < 5; i++)	
+			{
+				output >> reservation.tickets[i];
+			}							
+			output >> reservation.isBusHire;
 
 			//If passed name, day, and reason for transaction are the same, the record is found
-			if (Name2.compare(Name) == 0 && DateOfTravel.compare(Day.toString()) == 0)
+			if (reservation.name.compare(Name) == 0 && DateOfTravel.compare(Day.toString()) == 0)
 			{
 				isFound = true;
 				break; //break when record is found
@@ -526,94 +722,68 @@ bool Reservation::FindReservation(string Name, Date Day)
 			{
 				isFound = false;
 			}
+
+			getline(output, reservation.name);
 		}
 
-		//closes the file
 		output.close();
-	}
-	else
-	{
-		cout << "There has been an issue trying to access the file with the records. Please try again later\n\n";
-		isFound = false;
 	}
 
 	return isFound;
 
 }
 
-Reservation Reservation::GetReservation(string Name, Date Day)
+Reservation Reservation::GetReservation(string Name, Date Day) //
 {
-	try
+	ifstream output;
+
+	output.open("./ReservationInput.txt", ios::in);
+	if (output.is_open()) 
 	{
-		ifstream output;
 
-		//Opens file containing transactions
-		output.open("./ReservationInput.txt", ios::in);
-		if (output.is_open()) //Only try to read from file if file opened properly
+		Reservation reservation = Reservation();
+		string DateOfTravel;
+
+		while (getline(output, reservation.name)) //Gets name on the transaction 
 		{
-
-			Reservation reservation = Reservation();
-			//variables section for temporarily storing the data read from the file
-			string Name2;
-			string Address;
-			string ContactNumber;
-			string Email;
-			string DateOfTravel;
-			string Destination;
-			string BusType;
-			int* Tickets = new int[5]; //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-			bool IsBusHire;
-
-			while (getline(output, Name2)) //Gets name on the transaction 
+			//Gets string objects from file using getline() and other objects directly through >> 
+			//to prevent memory access violations sometimes caused by reading strings
+			getline(output, reservation.address);
+			getline(output, reservation.contactNumber);
+			getline(output, reservation.email);
+			getline(output, DateOfTravel);
+			getline(output, reservation.destination);
+			getline(output, reservation.busType);
+			output >> reservation.busID;
+			for (int i = 0; i < 52; i++)
 			{
-				//Gets string objects from file using getline() and other objects directly through >> 
-				//to prevent memory access violations sometimes caused by reading strings
-				getline(output, Address);
-				getline(output, ContactNumber);
-				getline(output, Email);
-				getline(output, DateOfTravel);
-				getline(output, Destination);
-				getline(output, BusType);
-				for (int i = 0; i < 5; i++) //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-				{
-					output >> Tickets[i];
-				}							//END SECTION
-				output >> IsBusHire;
+				output >> reservation.seats[i][0];
+				output >> reservation.seats[i][1];
+			}
+			for (int i = 0; i < 5; i++) 
+			{
+				output >> reservation.tickets[i];
+			}							
+			output >> reservation.isBusHire;
 
-				//If passed name, day, and reason for transaction are the same, the record is found
-				if (Name2.compare(Name) == 0 && DateOfTravel.compare(Day.toString()) == 0)
-				{
-					reservation.name = Name2;
-					reservation.address = Address;
-					reservation.contactNumber = ContactNumber;
-					reservation.email = Email;
-					reservation.dateOfTravel = Day;
-					reservation.destination = Destination;
-					reservation.busType = BusType;
-					reservation.tickets = Tickets;
-					reservation.isBusHire = IsBusHire;
-					break; //break when record is found
-				}
+			//If passed name, day, and reason for transaction are the same, the record is found
+			if (reservation.name.compare(Name) == 0 && DateOfTravel.compare(Day.toString()) == 0)
+			{
+				reservation.dateOfTravel = Day;
+				break; //break when record is found
 			}
 
-			//closes the file
-			output.close();
+			getline(output, reservation.name);
+		}
 
-			return reservation;
-		}
-		else
-		{
-			cout << "There has been an issue trying to access the file with the records. Please try again later\n\n";
-		}
-	}
-	catch (exception e)
-	{
-		cout << "Sorry, there has been an issue accessing the file with your records. Please try again later.\n\n";
-	}
-	
+		//closes the file
+		output.close();
+
+		return reservation;
+	}	
 }
 
-void Reservation::PrintReservation(Reservation Reservation)
+void Reservation::PrintReservation() //Prints reservation
 {
 	cout << "\n\nReservation Details\n\n"
 		<< "Name: " << this->name << "\n"
@@ -622,36 +792,29 @@ void Reservation::PrintReservation(Reservation Reservation)
 		<< "Email: " << this->email << "\n"
 		<< "Date of Travel: " << this->dateOfTravel.toString() << "\n"
 		<< "Destination: " << this->destination << "\n"
-		<< "Bus Type: " << this->busType << "\n";
-		int numTickets = 0;							//THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+		<< "Bus Type: " << this->busType << "\n"
+		<< "Bus Number: " << this->busID << "\n"
+		<< "Seats reserved: \n";
+		for (int i = 0; i < 52; i++)
+		{
+			if (this->seats[i][0] != -1)
+			{
+				cout << this->seats[i][0] + 1 << "-" << SeatTypes[this->seats[i][1]] << "\n";
+			}
+			
+		}
+		
+		int numTickets = 0;							
 		for (int i = 0; i < 5; i++)
 		{
 			numTickets += this->tickets[i];
 		}
-		cout <<"Tickets: " << numTickets << "\n";	//END SECTION
+		cout <<"Total tickets: " << numTickets << "\n";	
 		cout << ((this->isBusHire)? "This Reservation is for a bus hire." : "This is a personal reservation" ) << "\n\n";
 }
 
-void Reservation::DeleteReservation(Reservation Reservation)
+void Reservation::DeleteReservation(Reservation reservation)
 {
-	//ifstream read("infos.txt");
-	//ofstream write("tmp.txt");
-	//if (read.is_open()) {
-	//	std::string line;
-	//	while (getline(read, line)) {
-	//		if (line.find(ID) != std::string::npos)
-	//			write << line;
-	//	}
-	//}
-	//else {
-	//	std::cerr << "Error: coudn't open file\n";
-	//	/* additional handle */
-	//}
-
-	//read.close();
-	//write.close();
-	//std::remove("infos.txt");
-	//std::rename("tmp.txt", "infos.txt");
 	ifstream output;
 	
 	output.open("./ReservationInput.txt", ios::in);
@@ -662,45 +825,54 @@ void Reservation::DeleteReservation(Reservation Reservation)
 
 	if (output.is_open())
 	{
-		string Name;
-		string Address;
-		string ContactNumber;
-		string Email;
+		Reservation reservation2 = Reservation();
 		string DateOfTravel;
-		string Destination;
-		string BusType;
-		int* Tickets = new int[5]; //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-		bool IsBusHire;
 
-		while (getline(output, Name))
+		while (getline(output, reservation2.name)) //Gets name on the transaction 
 		{
-			getline(output, Address);
-			getline(output, ContactNumber);
-			getline(output, Email);
+			//Gets string objects from file using getline() and other objects directly through >> 
+			//to prevent memory access violations sometimes caused by reading strings
+			getline(output, reservation2.address);
+			getline(output, reservation2.contactNumber);
+			getline(output, reservation2.email);
 			getline(output, DateOfTravel);
-			getline(output, Destination);
-			getline(output, BusType);
-			for (int i = 0; i < 5; i++) //THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
+			getline(output, reservation2.destination);
+			getline(output, reservation2.busType);
+			output >> reservation2.busID;
+			for (int i = 0; i < 52; i++)
 			{
-				output >> Tickets[i];
-			}							//END SECTION
-			output >> IsBusHire;
-
-			if (Name.compare("") != 0 && !(Name.compare(Reservation.name) == 0 && DateOfTravel.compare(Reservation.dateOfTravel.toString()) == 0))
-			{
-				input << Name << endl;
-				input << Address << endl;
-				input << ContactNumber << endl;
-				input << Email << endl;
-				input << DateOfTravel << endl;
-				input << Destination << endl;
-				input << BusType << endl;
-				for (int i = 0; i < 5; i++)			//THIS SECTION WILL NEED TO CHANGE WITH NEW SCHEDULING IMPLEMENTATION
-				{
-					input << Tickets[i] << endl;
-				}									//END SECTION
-				input << IsBusHire << endl;
+				output >> reservation2.seats[i][0];
+				output >> reservation2.seats[i][1];
 			}
+			for (int i = 0; i < 5; i++)
+			{
+				output >> reservation2.tickets[i];
+			}
+			output >> reservation2.isBusHire;
+
+
+			if (reservation2.name.compare("") != 0 && !(reservation2.name.compare(reservation.name) == 0 && DateOfTravel.compare(reservation.dateOfTravel.toString()) == 0))
+			{
+				input << reservation2.name << endl;
+				input << reservation2.address << endl;
+				input << reservation2.contactNumber << endl;
+				input << reservation2.email << endl;
+				input << DateOfTravel << endl;
+				input << reservation2.destination << endl;
+				input << reservation2.busType << endl;
+				input << reservation2.busID << endl;
+				for (int i = 0; i < 52; i++)
+				{
+					input << reservation2.seats[i][0] << endl;
+					input << reservation2.seats[i][1] << endl;
+				}
+				for (int i = 0; i < 5; i++)			
+				{
+					input << reservation2.tickets[i] << endl;
+				}									
+				input << reservation2.isBusHire << endl;
+			}
+			getline(output, reservation2.name);
 		}
 		cout << "Reservation successfully deleted.\n\n";
 	}
@@ -709,6 +881,309 @@ void Reservation::DeleteReservation(Reservation Reservation)
 	output.close();
 	remove("./ReservationInput.txt");
 	rename("./ReservationTemp.txt", "./ReservationInput.txt");
+}
+
+void Reservation::ViewReservationByBusAndDate(long BusID, Date date)
+{
+	bool reservations = false;
+	ifstream output;
+
+	output.open("./ReservationInput.txt", ios::in);
+	if (output.is_open()) 
+	{
+
+		Reservation reservation = Reservation();
+		string DateOfTravel;
+
+		while (getline(output, reservation.name)) //Gets name on the transaction 
+		{
+			//Gets string objects from file using getline() and other objects directly through >> 
+			//to prevent memory access violations sometimes caused by reading strings
+			getline(output, reservation.address);
+			getline(output, reservation.contactNumber);
+			getline(output, reservation.email);
+			getline(output, DateOfTravel);
+			getline(output, reservation.destination);
+			getline(output, reservation.busType);
+			output >> reservation.busID;
+			for (int i = 0; i < 52; i++)
+			{
+				output >> reservation.seats[i][0];
+				output >> reservation.seats[i][1];
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				output >> reservation.tickets[i];
+			}
+			output >> reservation.isBusHire;
+
+			//If passed name, day, and reason for transaction are the same, the record is found
+			if (BusID == reservation.busID && DateOfTravel.compare(date.toString()) == 0)
+			{
+				reservation.dateOfTravel = date;
+				reservation.PrintReservation();
+				reservations = true;
+			}
+			getline(output, reservation.name);
+		}
+
+		//closes the file
+		output.close();
+
+		if (!reservations)
+		{
+			cout << "Sorry, there were no reservations found for that bus and day.\n\n";
+		}
+	}
+}
+
+void Reservation::ViewIncomeByBusByDate(long BusID, Date date)
+{
+	double amount = 0;
+	ifstream output;
+
+	output.open("./ReservationInput.txt", ios::in);
+	if (output.is_open())
+	{
+
+		Reservation reservation = Reservation();
+		string DateOfTravel;
+
+		while (getline(output, reservation.name)) //Gets name on the transaction 
+		{
+			//Gets string objects from file using getline() and other objects directly through >> 
+			//to prevent memory access violations sometimes caused by reading strings
+			getline(output, reservation.address);
+			getline(output, reservation.contactNumber);
+			getline(output, reservation.email);
+			getline(output, DateOfTravel);
+			getline(output, reservation.destination);
+			getline(output, reservation.busType);
+			output >> reservation.busID;
+			for (int i = 0; i < 52; i++)
+			{
+				output >> reservation.seats[i][0];
+				output >> reservation.seats[i][1];
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				output >> reservation.tickets[i];
+			}
+			output >> reservation.isBusHire;
+
+			//If passed name, day, and reason for transaction are the same, the record is found
+			if (BusID == reservation.busID && DateOfTravel.compare(date.toString()) == 0)
+			{
+				reservation.dateOfTravel = date;
+				Rates transaction = Rates();
+				transaction.GetTransaction(reservation.name, date, Reasons[0]);
+				if (transaction.GetDistance() == -1)
+				{
+					transaction.GetTransaction(reservation.name, date, Reasons[1]);
+				}
+				else if (transaction.GetDistance() == -1)
+				{
+					transaction.GetTransaction(reservation.name, date, Reasons[2]);
+				}
+				else
+				{
+					transaction.GetTransaction(reservation.name, date, Reasons[3]);
+				}
+				amount += transaction.GetAmount();
+
+			}
+			getline(output, reservation.name);
+		}
+
+		output.close();
+		cout << "The total revenue for bus number " << BusID << " on " << date.toString() << ": $" << amount << "\n";
+	}
+}
+
+void Reservation::ChangeReservationName(string Name, Date date, string newName)
+{
+	ifstream output;
+
+	output.open("./ReservationInput.txt", ios::in);
+
+	ofstream input;
+
+	input.open("./ReservationTemp.txt", ios::out);
+
+	if (output.is_open())
+	{
+		Reservation reservation = Reservation();
+		string DateOfTravel;
+
+		while (getline(output, reservation.name)) 
+		{
+			//Gets string objects from file using getline() and other objects directly through >> 
+			//to prevent memory access violations sometimes caused by reading strings
+			getline(output, reservation.address);
+			getline(output, reservation.contactNumber);
+			getline(output, reservation.email);
+			getline(output, DateOfTravel);
+			getline(output, reservation.destination);
+			getline(output, reservation.busType);
+			output >> reservation.busID;
+			for (int i = 0; i < 52; i++)
+			{
+				output >> reservation.seats[i][0];
+				output >> reservation.seats[i][1];
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				output >> reservation.tickets[i];
+			}
+			output >> reservation.isBusHire;
+
+			if (reservation.name.compare("") != 0 && !(reservation.name.compare(Name) == 0 && DateOfTravel.compare(date.toString()) == 0))
+			{
+				input << reservation.name << endl;
+				input << reservation.address << endl;
+				input << reservation.contactNumber << endl;
+				input << reservation.email << endl;
+				input << DateOfTravel << endl;
+				input << reservation.destination << endl;
+				input << reservation.busType << endl;
+				input << reservation.busID << endl;
+				for (int i = 0; i < 52; i++)
+				{
+					input << reservation.seats[i][0] << endl;
+					input << reservation.seats[i][1] << endl;
+				}
+				for (int i = 0; i < 5; i++)			
+				{
+					input << reservation.tickets[i] << endl;
+				}									
+				input << reservation.isBusHire << endl;
+			}
+			else
+			{
+				input << newName << endl;
+				input << reservation.address << endl;
+				input << reservation.contactNumber << endl;
+				input << reservation.email << endl;
+				input << DateOfTravel << endl;
+				input << reservation.destination << endl;
+				input << reservation.busType << endl;
+				input << reservation.busID << endl;
+				for (int i = 0; i < 52; i++)
+				{
+					input << reservation.seats[i][0] << endl;
+					input << reservation.seats[i][1] << endl;
+				}
+				for (int i = 0; i < 5; i++)
+				{
+					input << reservation.tickets[i] << endl;
+				}
+				input << reservation.isBusHire << endl;
+			}
+			getline(output, reservation.name);
+		}
+	}
+
+	input.close();
+	output.close();
+	remove("./ReservationInput.txt");
+	rename("./ReservationTemp.txt", "./ReservationInput.txt");
+
+}
+
+void Reservation::CancelReservationByBusByDate(long BusID, Date date)
+{
+	ifstream output;
+
+	output.open("./ReservationInput.txt", ios::in);
 
 
+	ofstream input;
+
+	input.open("./ReservationTemp.txt", ios::out);
+	if (output.is_open()) 
+	{
+
+		Reservation reservation = Reservation();
+		string DateOfTravel;
+
+		while (getline(output, reservation.name))
+		{
+			//Gets string objects from file using getline() and other objects directly through >> 
+			//to prevent memory access violations sometimes caused by reading strings
+			getline(output, reservation.address);
+			getline(output, reservation.contactNumber);
+			getline(output, reservation.email);
+			getline(output, DateOfTravel);
+			getline(output, reservation.destination);
+			getline(output, reservation.busType);
+			output >> reservation.busID;
+			for (int i = 0; i < 52; i++)
+			{
+				output >> reservation.seats[i][0];
+				output >> reservation.seats[i][1];
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				output >> reservation.tickets[i];
+			}
+			output >> reservation.isBusHire;
+
+			//If passed name, day, and reason for transaction are the same, the record is found
+			if (BusID == reservation.busID && DateOfTravel.compare(date.toString()) == 0)
+			{
+				reservation.dateOfTravel = date;
+				
+				Scheduling trip = Scheduling();
+				trip.findTrip(reservation.busID, reservation.destination, reservation.busType, reservation.dateOfTravel);
+				if (trip.getBusID() != -1)
+				{
+					for (int i = 0; i < 52; i++)
+					{
+						if (reservation.seats[i][0] != -1)
+						{
+							trip.resetSeat(reservation.seats[i][0] + 1, reservation.seats[i][1]);
+						}
+					}
+
+					trip.saveTrip();
+
+					Rates().SaveTransaction(reservation, reservation.GetDestination(reservation.destination), reservation.GetBusType(reservation.busType), Reasons[3]);
+
+				}
+				else
+				{
+					cout << "Sorry, unable to cancel reservations.\n";
+				}
+				
+			}
+			else
+			{
+				input << reservation.name << endl;
+				input << reservation.address << endl;
+				input << reservation.contactNumber << endl;
+				input << reservation.email << endl;
+				input << DateOfTravel << endl;
+				input << reservation.destination << endl;
+				input << reservation.busType << endl;
+				input << reservation.busID << endl;
+				for (int i = 0; i < 52; i++)
+				{
+					input << reservation.seats[i][0] << endl;
+					input << reservation.seats[i][1] << endl;
+				}
+				for (int i = 0; i < 5; i++)
+				{
+					input << reservation.tickets[i] << endl;
+				}
+				input << reservation.isBusHire << endl;
+			}
+			getline(output, reservation.name);
+		}
+
+		input.close();
+		output.close();
+		remove("./ReservationInput.txt");
+		rename("./ReservationTemp.txt", "./ReservationInput.txt");
+		Scheduling().CancelReservationByBusByDate(BusID, date);
+	}
 }
