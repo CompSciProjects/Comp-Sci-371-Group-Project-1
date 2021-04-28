@@ -41,6 +41,8 @@ public:
 	double GetDeposit(bool IsBusHire, int BusType);
 	double GetPenalty(Date Day, string Reason);
 	double GetAmount(Rates Rates, bool IsBusHire, int BusType);
+	double GetDistance();
+	double GetAmount();
 	double setLuxSeatRate(double changeAmountWindow, double changeAmountOther);
 	double setMiniBusSeatRate(double changeAmount);
 	double setMiniVanSeatRate(double changeAmount);
@@ -53,8 +55,11 @@ public:
 	double getMiniVanSeatRate();
 	void SaveTransaction(Reservation Reservation, int Destination, int BusType, string Reason);
 	bool FindTransaction(string Name, Date Day, string Reason);
-	Rates GetTransaction(string Name, Date Day, string Reason);
+	void GetTransaction(string Name, Date Day, string Reason);
 	void PrintTransaction(Rates Transaction);
+	void CheckWeeklySales(Date date);
+	void ChangeTransactionName(Reservation Reservation, string NewName);
+	void ChangeReservationCharge(Reservation Reservation, double Amount);
 
 	//Overload = operator
 	const Rates& operator=(const Rates& right)
