@@ -18,6 +18,21 @@ void Date::SetYear(int Year)
 	this->year = Year;
 }
 
+int Date::GetDay()
+{
+	return this->day;
+}
+
+int Date::GetMonth()
+{
+	return this->month;
+}
+
+int Date::GetYear()
+{
+	return this->year;
+}
+
 Date::Date(unsigned int m, unsigned int d, unsigned int y) : month{ m }, day{ d }, year{ y }
 {
 	//Year validation
@@ -83,7 +98,7 @@ Date::Date(unsigned int m, unsigned int d, unsigned int y) : month{ m }, day{ d 
 			leapYear = false;
 		}
 
-		if (d < 0 || (leapYear) ? d > 29 : d > 28)
+		if (d < 0 || ((leapYear) ? d > 29 : d > 28))
 		{
 			this->day = 1;
 		}
@@ -186,3 +201,4 @@ void Date::nextDay()
 		break;
 	}
 }
+
