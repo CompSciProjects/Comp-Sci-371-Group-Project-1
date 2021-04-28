@@ -11,6 +11,9 @@ public:
 	void SetDay(int Day);
 	void SetMonth(int Month);
 	void SetYear(int Year);
+	int GetDay();
+	int GetMonth();
+	int GetYear();
 	std::string toString() const;
 	void nextDay();
 private:
