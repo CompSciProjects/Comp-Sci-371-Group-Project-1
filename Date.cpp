@@ -9,10 +9,12 @@ void Date::SetDay(int Day)
 {
 	this->day = Day;
 }
+
 void Date::SetMonth(int Month)
 {
 	this->month = Month;
 }
+
 void Date::SetYear(int Year)
 {
 	this->year = Year;
@@ -65,6 +67,7 @@ Date::Date(unsigned int m, unsigned int d, unsigned int y) : month{ m }, day{ d 
 	case 8:
 	case 10:
 	case 12:
+
 		if (d < 0 || d > 31)
 		{
 			this->day = 1;
@@ -78,6 +81,7 @@ Date::Date(unsigned int m, unsigned int d, unsigned int y) : month{ m }, day{ d 
 	case 6:
 	case 9:
 	case 11:
+
 		if (d < 0 || d > 30)
 		{
 			this->day = 1;
@@ -88,6 +92,7 @@ Date::Date(unsigned int m, unsigned int d, unsigned int y) : month{ m }, day{ d 
 		}
 		break;
 	case 2:
+
 		bool leapYear;
 		if (y % 4 == 0)
 		{
@@ -123,6 +128,7 @@ void Date::nextDay()
 	int d = this->day + 1;
 	int m = this->month;
 	int y = this->year;
+
 	switch (m)
 	{
 	case 1:
@@ -132,6 +138,7 @@ void Date::nextDay()
 	case 8:
 	case 10:
 	case 12:
+
 		if (d > 31)
 		{
 			this->day = 1;
@@ -154,6 +161,7 @@ void Date::nextDay()
 	case 6:
 	case 9:
 	case 11:
+
 		if (d > 30)
 		{
 			this->day = 1;
@@ -165,24 +173,11 @@ void Date::nextDay()
 		}
 		break;
 	case 2:
+
 		bool leapYear;
 		if (y % 4 == 0)
 		{
-			if (y % 100 == 0)
-			{
-				if (y % 400 == 0)
-				{
-					leapYear = true;
-				}
-				else
-				{
-					leapYear = false;
-				}
-			}
-			else
-			{
-				leapYear = true;
-			}
+			leapYear = true;
 		}
 		else
 		{
