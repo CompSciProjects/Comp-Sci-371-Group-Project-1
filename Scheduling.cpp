@@ -20,115 +20,129 @@ int Scheduling::getBusCount(int BusType) //Gets total number of busses if given 
 
 	fstream output;
 
-	//Opens file containing transactions
 	output.open("./BusInventoryInput.txt", ios::in);
 
-	long BusID;
-	string BusType2;
-	int Month;
-	int Year;
-	string Name;
-
-	while (output >> BusID)
+	if (output.is_open())
 	{
-		getline(output, BusType2);
-		getline(output, BusType2);
-		output >> Month;
-		output >> Year;
-		getline(output, Name);
-		getline(output, Name);
-
-		if ((BusType == -1) ? true : BusTypes[BusType].compare(BusType2) == 0)
-		{
-			count++;
-		}
+		long BusID;
+			string BusType2;
+			int Month;
+			int Year;
+			string Name;
+		
+			while (output >> BusID)
+			{
+				getline(output, BusType2);
+				getline(output, BusType2);
+				output >> Month;
+				output >> Year;
+				getline(output, Name);
+				getline(output, Name);
+		
+				if ((BusType == -1) ? true : BusTypes[BusType].compare(BusType2) == 0)
+				{
+					count++;
+				}
+			}
+		
+			return count;
 	}
-
-	return count;
+	else
+	{
+		throw exception("There has been an issue trying to open BusInventoryInput.txt");
+	}
 }
 
-//mutator methods to add new vehicles of each type
-void Scheduling::addVehicle(int BusType)
+void Scheduling::addVehicle(int BusType) //mutator method to add new vehicles of each type
 {
 	fstream input;
 
-	//Opens file containing transactions
 	input.open("./BusInventoryInput.txt", ios::app);
 
-	if (input.is_open()) //Only try to save to file if file opened properly
+	if (input.is_open()) 
 	{
-		long BusID = getBusCount();
+		long BusID = getBusCount() + 1;
 
 		struct tm tm;
 		time_t ttime = time(0);
 		localtime_s(&tm, &ttime);
 		int Month = 1 + tm.tm_mon;
 		int Year = 1900 + tm.tm_year;
+
+		cout << "\nPlease enter the name of the driver for this new vehicle: ";
 		string Name;
-		cout << "Please enter the name of the driver for this new vehicle: ";
 		cin.ignore();
 		getline(cin, Name);
 
-		//writes the data gathered above into the file
 		input << BusID << endl;
 		input << BusTypes[BusType] << endl;
 		input << Month << endl;
 		input << Year << endl;
 		input << Name << endl;
 
-		//closes the file
 		input.close();
+	}
+	else
+	{
+		throw exception("There has been an issue trying to open BusInventoryInput.txt");
 	}
 }
 
 long Scheduling::isVehicleAvailable(string BusType, Date date) //Finds an available vehicle given the criteria, returns the busID
 {
 	long isAvailable = 0;
+
 	fstream output;
 
-	//Opens file containing transactions
 	output.open("./BusInventoryInput.txt", ios::in);
 
-	long BusID;
-	string BusType2;
-	int Month;
-	int Year;
-	string Name;
-
-	while (output >> BusID)
+	if (output.is_open())
 	{
-		getline(output, BusType2);
-		getline(output, BusType2);
-		output >> Month;
-		output >> Year;
-		getline(output, Name);
-		getline(output, Name);
-
-		if (BusType.compare(BusType2) == 0 && ((Year == date.GetYear()) ? Month < date.GetMonth() : true))
+		long BusID;
+		string BusType2;
+		int Month;
+		int Year;
+		string Name;
+	
+		while (output >> BusID)
 		{
-			this->findTrip(BusID, date);
-			if (this->busID == -1)
+			getline(output, BusType2);
+			getline(output, BusType2);
+			output >> Month;
+			output >> Year;
+			getline(output, Name);
+			getline(output, Name);
+	
+			if (BusType.compare(BusType2) == 0 && ((Year == date.GetYear()) ? Month < date.GetMonth() : true))
 			{
-				output.close();
-				isAvailable = BusID;
-				return isAvailable;
+				this->findTrip(BusID, date);
+				if (this->busID == -1)
+				{
+					output.close();
+					isAvailable = BusID;
+					return isAvailable;
+				}
 			}
 		}
+	
+		output.close();
+	
+		return isAvailable;
 	}
-	output.close();
-
-	return isAvailable;
+	else
+	{
+		throw exception("There has been an issue trying to open BusInventoryInput.txt");
+	}
 }
 
 bool Scheduling::getTrip(string Destination, string BusType, Date date, int Tickets) //if trip is available or if trip can be created, return true, else return false
 {
-	//find trip, if trip exists, return the available seats
-	//if trip does not exist, create one and return the available seats
 	this->findTrip(Destination, BusType, date, Tickets);
 
 	if (this->busID == -1)
 	{
 		long ID = isVehicleAvailable(BusType, date);
+
 		if (ID != 0)
 		{
 			this->createTrip(ID, Destination, BusType, date);
@@ -138,15 +152,14 @@ bool Scheduling::getTrip(string Destination, string BusType, Date date, int Tick
 			return false;
 		}
 	}
-	return true;
 
+	return true;
 }
 
 void Scheduling::findTrip(long BusID, Date date)
 {
 	fstream output;
 
-	//Opens file containing trip schedule
 	output.open("./TripScheduleInput.txt", ios::in);
 
 	if (output.is_open())
@@ -168,6 +181,7 @@ void Scheduling::findTrip(long BusID, Date date)
 					output >> trip.seatArray[i][j];
 				}
 			}
+
 			if (trip.busID == BusID && TripDate.compare(date.toString()) == 0)
 			{
 				trip.tripDate = date;
@@ -179,15 +193,19 @@ void Scheduling::findTrip(long BusID, Date date)
 				this->busID = -1;
 			}
 		}
+
 		output.close();
+	}
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
 	}
 }
 
 void Scheduling::findTrip(string Destination, string BusType, Date date, int Tickets) //loops through trips, if arguments match, return the trip, else set busID = -1
 {
 	fstream output;
-
-	//Opens file containing trip schedule
+	
 	output.open("./TripScheduleInput.txt", ios::in);
 
 	if (output.is_open())
@@ -221,11 +239,17 @@ void Scheduling::findTrip(string Destination, string BusType, Date date, int Tic
 				this->busID = -1;
 			}
 		}
+
 		if (trip.busType.compare("") == 0)
 		{
 			this->busID = -1;
 		}
+
 		output.close();
+	}
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
 	}
 }
 
@@ -233,7 +257,6 @@ void Scheduling::findTrip(long BusID, string Destination, string BusType, Date d
 {
 	fstream output;
 
-	//Opens file containing trip schedule
 	output.open("./TripScheduleInput.txt", ios::in);
 
 	if (output.is_open())
@@ -256,7 +279,6 @@ void Scheduling::findTrip(long BusID, string Destination, string BusType, Date d
 				}
 			}
 
-
 			if (trip.busID == BusID && trip.destination.compare(Destination) == 0 && trip.busType.compare(BusType) == 0 && TripDate.compare(date.toString()) == 0)
 			{
 				trip.tripDate = date;
@@ -268,7 +290,12 @@ void Scheduling::findTrip(long BusID, string Destination, string BusType, Date d
 				this->busID = -1;
 			}
 		}
+
 		output.close();
+	}
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
 	}
 }
 
@@ -312,6 +339,7 @@ void Scheduling::createTrip(long BusID, string Destination, string BusType, Date
 	else if (BusType.compare(BusTypes[1]) == 0)
 	{
 		this->seatsAvailable = 36;
+
 		for (int i = 0; i < 12; i++)
 		{
 			for (int j = 0; j < 5; j++)
@@ -330,6 +358,7 @@ void Scheduling::createTrip(long BusID, string Destination, string BusType, Date
 	else
 	{
 		this->seatsAvailable = 12;
+
 		for (int i = 0; i < 12; i++)
 		{
 			for (int j = 0; j < 5; j++)
@@ -408,13 +437,16 @@ void Scheduling::deleteTrip(long BusID, string Destination, string BusType, Date
 				}
 			}
 		}
+
+		input.close();
+		output.close();
+		remove("./TripScheduleInput.txt");
+		rename("./TripScheduleTemp.txt", "./TripScheduleInput.txt");
 	}
-
-	input.close();
-	output.close();
-	remove("./TripScheduleInput.txt");
-	rename("./TripScheduleTemp.txt", "./TripScheduleInput.txt");
-
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
+	}
 }
 
 void Scheduling::saveTrip() //saves trip
@@ -423,7 +455,6 @@ void Scheduling::saveTrip() //saves trip
 
 	fstream input;
 
-	//Opens file containing trip schedule
 	input.open("./TripScheduleInput.txt", ios::app);
 
 	if (input.is_open())
@@ -440,7 +471,12 @@ void Scheduling::saveTrip() //saves trip
 				input << this->seatArray[i][j] << endl;
 			}
 		}
+
 		input.close();
+	}
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
 	}
 }
 
@@ -457,6 +493,7 @@ void Scheduling::printSeatArray() //Prints the seat layout
 		{
 			cout << i + 1 << ". ";
 		}
+
 		for (int j = 0; j < 5; j++)
 		{
 			if (seatArray[i][j] != '-')
@@ -464,6 +501,7 @@ void Scheduling::printSeatArray() //Prints the seat layout
 				cout << seatArray[i][j] << "\t";
 			}
 		}
+
 		if (seatArray[i][1] != '-')
 		{
 			cout << "\n\n";
@@ -482,6 +520,7 @@ void Scheduling::printSeatRow(int row) //prints the seat layout for specific row
 		}
 	}
 	cout << "\n   ";
+
 	for (int j = 0; j < 5; j++)
 	{
 		if (seatArray[row - 1][j] != '-')
@@ -528,14 +567,18 @@ double Scheduling::checkCapacity() //returns capacity amount
 	return capacity;
 }
 
-void Scheduling::CancelUnderCapacityTrips() //cancel trips under 50% capacity
+bool Scheduling::CancelUnderCapacityTrips() //cancel trips under 50% capacity
 {
+	bool tripsCanceled = false;
+
 	struct tm newtime;
 	time_t ttime = time(0);
 	localtime_s(&newtime, &ttime);
+
 	Date TwoDaysAway = Date(newtime.tm_mon + 1, newtime.tm_mday, newtime.tm_year + 1900);
 	TwoDaysAway.nextDay();
 	TwoDaysAway.nextDay();
+
 	ifstream output;
 
 	output.open("./TripScheduleInput.txt", ios::in);
@@ -549,7 +592,7 @@ void Scheduling::CancelUnderCapacityTrips() //cancel trips under 50% capacity
 		Scheduling trip = Scheduling();
 		string date;
 
-		while (output >> trip.busType)
+		while (output >> trip.busID)
 		{
 			getline(output, trip.busType);
 			getline(output, trip.busType);
@@ -564,12 +607,16 @@ void Scheduling::CancelUnderCapacityTrips() //cancel trips under 50% capacity
 				}
 			}
 
-			Scheduling returnTrip = Scheduling();
-			int returnTripDestination = Reservation().GetDestination(trip.destination);
-			returnTrip.destination = (Reservation().Destinations[returnTripDestination].compare(trip.destination) == 0) ? Reservation().Destinations[returnTripDestination + 5] : Reservation().Destinations[returnTripDestination];
-			returnTrip.findTrip(trip.busID, returnTrip.destination, trip.busType, TwoDaysAway);
+			int Destination;
+			for (Destination = 0; Destination < 10; Destination++)
+			{
+				if (trip.destination.compare(Destinations[Destination]) == 0)
+				{
+					break;
+				}
+			}
 
-			if (date.compare(TwoDaysAway.toString()) != 0 || (returnTrip.busID != -1 && (trip.checkCapacity() > .5 || returnTrip.checkCapacity() > .5)))
+			if (date.compare(TwoDaysAway.toString()) != 0 || trip.checkCapacity() >= .5)
 			{
 				input << trip.busID << endl;
 				input << trip.busType << endl;
@@ -586,17 +633,25 @@ void Scheduling::CancelUnderCapacityTrips() //cancel trips under 50% capacity
 			}
 			else
 			{
-				Reservation tripReservation = Reservation();
-				tripReservation.CancelReservationByBusByDate(trip.busID, TwoDaysAway);
+				tripsCanceled = true;
 
+				cout << "The " << date << " trip from " << trip.destination << " was under capacity and has been canceled.\n"
+					<< "System automatically attempting to cancel and refund all reservations on that trip...\n\n";
+				Reservation tripReservation = Reservation();
+				tripReservation.CancelReservationByBusByDate(trip.busID, trip.destination, TwoDaysAway);
 			}
 		}
-
 
 		input.close();
 		output.close();
 		remove("./TripScheduleInput.txt");
 		rename("./TripScheduleTemp.txt", "./TripScheduleInput.txt");
+
+		return tripsCanceled;
+	}
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
 	}
 }
 
@@ -652,7 +707,10 @@ void Scheduling::CancelReservationByBusByDate(long BusID, Date date) //cancels t
 		remove("./TripScheduleInput.txt");
 		rename("./TripScheduleTemp.txt", "./TripScheduleInput.txt");
 	}
-
+	else
+	{
+		throw exception("There has been an issue trying to open TripScheduleInput.txt");
+	}
 }
 
 long Scheduling::getBusIDList() //prints out list of busses, asks for bus number selection, returns selection
@@ -660,38 +718,48 @@ long Scheduling::getBusIDList() //prints out list of busses, asks for bus number
 	int count = 0;
 	fstream output;
 
-	//Opens file containing transactions
 	output.open("./BusInventoryInput.txt", ios::in);
 
-	long BusID;
-	string BusType2;
-	int Month;
-	int Year;
-	string Name;
-
-	while (output >> BusID)
+	if (output.is_open())
 	{
-		getline(output, BusType2);
-		getline(output, BusType2);
-		output >> Month;
-		output >> Year;
-		getline(output, Name);
-		getline(output, Name);
+		long BusID;
+		string BusType2;
+		int Month;
+		int Year;
+		string Name;
 
-		cout << "Bus Number: " << BusID << "\tBus Type: " << BusType2 << "\tBus Driver: " << Name << "\n";
-		count++;
+		cout << "\n";
 
-	}
-	long selection;
-	cout << "\nPlease enter the bus number of the bus you wish to select: ";
-	cin >> selection;
-	while (selection < 0 || selection > count)
-	{
-		cout << "That selection is not valid.\n"
-			<< "\nPlease enter the bus number of the bus you wish to select: ";
-		cin.clear();
-		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		while (output >> BusID)
+		{
+			getline(output, BusType2);
+			getline(output, BusType2);
+			output >> Month;
+			output >> Year;
+			getline(output, Name);
+			getline(output, Name);
+
+			cout << "Bus Number: " << BusID << "\tBus Type: " << BusType2 << "\tBus Driver: " << Name << "\n";
+			count++;
+		}
+
+		cout << "\nPlease enter the bus number of the bus you wish to select: ";
+		long selection;
 		cin >> selection;
+
+		while (selection < 0 || selection > count)
+		{
+			cout << "\nThat selection is not valid.\n"
+				<< "\nPlease enter the bus number of the bus you wish to select: ";
+			cin.clear();
+			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			cin >> selection;
+		}
+
+		return selection;
 	}
-	return selection;
+	else
+	{
+		throw exception("There has been an issue trying to open BusInventoryInput.txt");
+	}
 }
