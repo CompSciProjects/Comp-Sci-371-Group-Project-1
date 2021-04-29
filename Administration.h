@@ -15,7 +15,6 @@ private:
 	double changeAmount = 0; //rent rate
 	double changeAmountWindow = 0;
 public:
-	//reference to all methods from Administration.cpp
 	void AdminMenu();
 	void AddVehicles();
 	void EditReservation(Date date);
