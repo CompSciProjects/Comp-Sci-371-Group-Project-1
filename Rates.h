@@ -43,12 +43,12 @@ public:
 	double GetAmount(Rates Rates, bool IsBusHire, int BusType);
 	double GetDistance();
 	double GetAmount();
-	double setLuxSeatRate(double changeAmountWindow, double changeAmountOther);
-	double setMiniBusSeatRate(double changeAmount);
-	double setMiniVanSeatRate(double changeAmount);
-	double setLuxBusRate(double changeAmount, double mileCost, double secDeposit);
-	double setMiniBusRate(double changeAmount, double mileCost, double secDeposit);
-	double setMiniVanRate(double changeAmount, double mileCost, double secDeposit);
+	void setLuxSeatRate(double changeAmountWindow, double changeAmountOther);
+	void setMiniBusSeatRate(double changeAmount);
+	void setMiniVanSeatRate(double changeAmount);
+	void setLuxBusRate(double changeAmount, double mileCost, double secDeposit);
+	void setMiniBusRate(double changeAmount, double mileCost, double secDeposit);
+	void setMiniVanRate(double changeAmount, double mileCost, double secDeposit);
 	double getLuxSeatRate();
 	double getLuxSeatRateWindow();
 	double getMiniBussSeatRate();
