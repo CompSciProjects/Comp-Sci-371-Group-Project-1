@@ -27,8 +27,9 @@ private:
 public:
 	string BusTypes[3] = { "Luxury Bus", "Mini Bus", "Minivan" };
 	string Destinations[10] = { "Green Bay to Madison", "Green Bay to Milwakee", "Green Bay to Whitewater", "Green Bay to Oshkosh", "Green Bay to Eau Claire",
-	"Madison to Green Bay", "Milwakee to Green Bay", "Whitewater to Green Bay", "Oshkosk to Green Bay", "Eau Claire to Green Bay"};
+	"Madison to Green Bay", "Milwakee to Green Bay", "Whitewater to Green Bay", "Oshkosh to Green Bay", "Eau Claire to Green Bay"};
 	char SeatTypes[5] = { 'A', 'B', 'E', 'D', 'C' };
+
 	//Reasons for reservations
 	string Reasons[4] = { "Standard Seat Reservations", "Bus Hire", "Cancel Reservation", "Company Authorized Cancellation" };
 
@@ -56,11 +57,17 @@ public:
 	void ViewIncomeByBusByDate(long BusID, Date date);
 	void ChangeReservationName(string Name, Date date, string newName);
 	void CancelReservationByBusByDate(long BusID, Date date);
+	void CancelReservationByBusByDate(long BusID, string Destination, Date date);
 
 	//Destructor
 	~Reservation()
 	{
 		tickets = new int[5];
+		for (int i = 0; i < 52; i++)
+		{
+			seats[i][0] = -1;
+			seats[i][1] = -1;
+		}
 	}
 
 	//Constructor
