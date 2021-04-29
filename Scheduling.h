@@ -30,7 +30,7 @@ public:
 	void setSeat(int row, int col);
 	void resetSeat(int row, int col);
 	double checkCapacity();
-	void CancelUnderCapacityTrips();
+	bool CancelUnderCapacityTrips();
 	void CancelReservationByBusByDate(long BusID, Date date);
 	long getBusIDList();
 
@@ -40,6 +40,7 @@ public:
 		{
 			this->busID = right.busID;
 			this->busType = right.busType;
+			this->destination = right.destination;
 			this->tripDate = right.tripDate;
 			this->seatsAvailable = right.seatsAvailable;
 
@@ -52,9 +53,7 @@ public:
 			}
 		}
 
-
 		return *this;
 	}
-
 };
 #endif
