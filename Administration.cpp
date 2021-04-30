@@ -6,7 +6,7 @@
 #include <time.h>
 using namespace std;
 
-double inputValidation(double num)
+double inputValidation(double num) //Generic input validation method
 {
 	if (num <= 0)
 	{
@@ -22,7 +22,7 @@ double inputValidation(double num)
 	return num;
 }
 
-bool CancelDateValidation(Date date) 
+bool CancelDateValidation(Date date) //date validation, if attempting to cancel a trip within 2 days, or in a past date returns false, else true
 {
 	bool isValid = true;
 
@@ -148,7 +148,7 @@ void Admin::AdminMenu()
 	}
 }
 
-void Admin::AddVehicles()
+void Admin::AddVehicles() //Method to add vehicles to inventory
 {
 
 	int vOption = 0;
@@ -157,7 +157,7 @@ void Admin::AddVehicles()
 		cout << "1. Luxury Bus\n"
 			<< "2. MiniBus\n"
 			<< "3. Minivan\n"
-			<< "4. None, finish adding vehicles\n"
+			<< "4. Exit\n"
 			<< "Which type of vehicle would you like to add? ";
 		cin >> vOption;
 
@@ -198,7 +198,7 @@ void Admin::AddVehicles()
 	}
 }
 
-void Admin::EditReservation(Date date)
+void Admin::EditReservation(Date date) //Edit reservation name or charge
 {
 	cout << "\n1. Name\n"
 		<< "2. Charge\n"
@@ -264,14 +264,14 @@ void Admin::EditReservation(Date date)
 	}
 }
 
-void Admin::ChangeReservationCharge()
+void Admin::ChangeReservationCharge() //change charges of seats and/or bus hire rates
 {
 	int vOption = 0;
 	while (vOption != 3) 
 	{
 		cout << "1. Seat Reservation Charge\n"
 			<< "2. Bus Hire Charge\n"
-			<< "3. Return to Administration Menu\n"
+			<< "3. Exit\n"
 			<< "Which would you like to change? ";
 		cin >> vOption;
 
@@ -282,7 +282,7 @@ void Admin::ChangeReservationCharge()
 			cout << "\n\n1. Luxury Bus Seats\n"
 				<< "2. MiniBus Seats\n"
 				<< "3. MiniVan Seats\n"
-				<< "4. Return to Administration Menu.\n"
+				<< "4. Exit\n"
 				<< "Which vehicle would you like to change the seat charge for? ";
 			cin >> changeChoice;
 
@@ -297,8 +297,8 @@ void Admin::ChangeReservationCharge()
 				changeAmount = inputValidation(changeAmount);
 
 				Rates().setLuxSeatRate(changeAmountWindow, changeAmount);
-				cout << "New Luxury window/aisle seat rate: " << Rates().getLuxSeatRateWindow() << "\n"
-					<< "New Luxury regular seat rate: " << Rates().getLuxSeatRate() << "\n\n";
+				cout << "New Luxury window/aisle seat rate: $" << Rates().getLuxSeatRateWindow() << " per mile\n"
+					<< "New Luxury regular seat rate: $" << Rates().getLuxSeatRate() << " per mile\n\n";
 			}
 			else if (changeChoice == 2) 
 			{
@@ -307,7 +307,7 @@ void Admin::ChangeReservationCharge()
 				changeAmount = inputValidation(changeAmount);
 
 				Rates().setMiniBusSeatRate(changeAmount);
-				cout << "New MiniBus seat charge rate: " << Rates().getMiniBussSeatRate() << "\n\n";
+				cout << "New MiniBus seat charge rate: $" << Rates().getMiniBussSeatRate() << " per mile\n\n";
 			}
 			else if (changeChoice == 3) 
 			{
@@ -316,7 +316,7 @@ void Admin::ChangeReservationCharge()
 				changeAmount = inputValidation(changeAmount);
 
 				Rates().setMiniVanSeatRate(changeAmount);
-				cout << "New MiniVan seat charge rate: " << Rates().getMiniVanSeatRate() << "\n\n";
+				cout << "New MiniVan seat charge rate: $" << Rates().getMiniVanSeatRate() << " per mile\n\n";
 			}
 			else if (changeChoice == 4) 
 			{
@@ -331,10 +331,10 @@ void Admin::ChangeReservationCharge()
 			break;
 		case 2: //change bus hire charge
 
-			cout << "1. Luxury Bus\n"
+			cout << "\n1. Luxury Bus\n"
 				<< "2. MiniBus\n"
 				<< "3. MiniVan\n"
-				<< "4. Return to Administration Menu.\n"
+				<< "4. Exit\n"
 				<< "Which vehicle would you like to change the Bus rental prices for? ";
 			cin >> changeChoice;
 
@@ -409,7 +409,7 @@ void Admin::ChangeReservationCharge()
 	}
 }
 
-Date Admin::EnterDate()
+Date Admin::EnterDate() //Generic date enty method
 {
 	struct tm newtime;
 	time_t ttime = time(0);
