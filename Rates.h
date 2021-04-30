@@ -37,12 +37,14 @@ public:
 
 	//Member Functions
 	double GetRate(int* Tickets, int BusType, bool IsBusHire);
+	void GetRate(int BusType, int Destination, bool IsBusHire);
 	double GetRentalFee(bool IsBusHire, int BusType);
 	double GetDeposit(bool IsBusHire, int BusType);
 	double GetPenalty(Date Day, string Reason);
 	double GetAmount(Rates Rates, bool IsBusHire, int BusType);
 	double GetDistance();
 	double GetAmount();
+	double GetDeposit();
 	void setLuxSeatRate(double changeAmountWindow, double changeAmountOther);
 	void setMiniBusSeatRate(double changeAmount);
 	void setMiniVanSeatRate(double changeAmount);
