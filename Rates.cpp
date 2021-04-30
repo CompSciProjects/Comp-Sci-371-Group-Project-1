@@ -5,6 +5,7 @@
 #include <iomanip>
 using namespace std;
 
+
 //seat cost rates
 double LUXURYAISLEANDWINDOW = 0.95; //In  luxury  bus, aisle  and  window  seat  costs   $0.95  per  mile
 double LUXURYOTHER = 0.75;		  //the other seat  costs  $0.75 per mile
@@ -80,6 +81,71 @@ double Rates::GetRate(int* Tickets, int BusType, bool IsBusHire) //Method totals
     }
 
     return ticketAmount;
+}
+
+void Rates::GetRate(int BusType, int Destination, bool IsBusHire) //Prints going rate for reservation details
+{
+    cout << "\n\nGoing rates for a " << Reservation().BusTypes[BusType] << ((IsBusHire) ? " bus hire:\n" : " standard seat reservation:\n");
+
+    switch (BusType)
+    {
+    case 0:
+
+        if (IsBusHire)
+        {
+            cout << "Security Deposit: $" << LUXURYBH[2]
+                << "\nRental Fee: $" << LUXURYBH[0]
+                << "\nTicket Prices: $" << LUXURYOTHER << " per mile for seats in column D and $" << LUXURYAISLEANDWINDOW
+                << " per mile for seats in other columns, \nplus an extra charge of $" << LUXURYBH[1] << " per mile for each ticket.\n\n"
+                << "Going to your destination, the price comes out about to $" << (LUXURYAISLEANDWINDOW + LUXURYBH[1]) * Distances[Destination]
+                << " per ticket, \nplus the rental fee, deposit, and tax (deposit is not taxed).";
+        }
+        else
+        {
+            cout << "Ticket Prices: $" << LUXURYOTHER << " per mile for seats in column D and $" << LUXURYAISLEANDWINDOW
+                << " per mile for seats in other columns.\n\n" << "Going to your destination, the price comes out about to $" 
+                << LUXURYAISLEANDWINDOW * Distances[Destination] << " per ticket.";
+        }
+        break;
+    case 1:
+
+        if (IsBusHire)
+        {
+            cout << "Deposit: $" << MINIBUSBH[2]
+                << "\nRental Fee: $" << MINIBUSBH[0]
+                << "\nTicket Prices: $" << MINIBUSSEAT << " per mile for all seats"
+                << ", \nplus an extra charge of $" << MINIBUSBH[1] << " per mile for each ticket.\n\n"
+                << "Going to your destination, the price comes out about to $" << (MINIBUSSEAT + MINIBUSBH[1]) * Distances[Destination]
+                << " per ticket, \nplus the rental fee, deposit, and tax (deposit is not taxed).";
+        }
+        else
+        {
+            cout << "Ticket Prices: $" << MINIBUSSEAT << " per mile for all seats.\n\n"
+                << "Going to your destination, the price comes out about to $"
+                << MINIBUSSEAT * Distances[Destination] << " per ticket.";
+        }
+        break;
+    case 2:
+
+        if (IsBusHire)
+        {
+            cout << "Deposit: $" << MINIVANBH[2]
+                << "\nRental Fee: $" << MINIVANBH[0]
+                << "\nTicket Prices: $" << MINIVANSEAT << " per mile for all seats"
+                << ", plus an extra charge of $" << MINIVANBH[1] << " per mile for each ticket.\n\n"
+                << "Going to your destination, the price comes out about to $" << (MINIVANSEAT + MINIVANBH[1]) * Distances[Destination]
+                << " per ticket, \nplus the rental fee, deposit, and tax (deposit is not taxed).";
+        }
+        else
+        {
+            cout << "Ticket Prices: $" << MINIVANSEAT << " per mile for all seats.\n\n"
+                << "Going to your destination, the price comes out about to $"
+                << MINIVANSEAT * Distances[Destination] << " per ticket.";
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 double Rates::GetRentalFee(bool IsBusHire, int BusType) //Method finds the rental fee if applicable
@@ -214,6 +280,11 @@ double Rates::GetAmount() //Method returns amount
     return this->amount;
 }
 
+double Rates::GetDeposit() //Method returns deposit
+{
+    return this->deposit;
+}
+
 void Rates::setLuxSeatRate(double changeAmountWindow, double changeAmount) //Method sets Luxury Bus seat rates
 {
     LUXURYAISLEANDWINDOW = changeAmountWindow;
@@ -236,9 +307,9 @@ void Rates::setLuxBusRate(double changeAmount, double mileCost, double secDeposi
     LUXURYBH[1] = mileCost;
     LUXURYBH[2] = secDeposit;
 
-    cout << "New Luxury bus flat fee: " << LUXURYBH[0]
-        << "\nNew milage fee: " << LUXURYBH[1]
-        << "\nNew security deposit fee: " << LUXURYBH[2] << "\n\n";
+    cout << "\nNew Luxury bus flat fee: $" << LUXURYBH[0]
+        << "\nNew milage fee: $" << LUXURYBH[1] << " additional per mile"
+        << "\nNew security deposit fee: $" << LUXURYBH[2] << "\n\n";
 }
 
 void Rates::setMiniBusRate(double changeAmount, double mileCost, double secDeposit) //Method sets MiniBus bus hire rates
@@ -247,9 +318,9 @@ void Rates::setMiniBusRate(double changeAmount, double mileCost, double secDepos
     MINIBUSBH[1] = mileCost;
     MINIBUSBH[2] = secDeposit;
 
-    cout << "New MiniBus flat fee: " << MINIBUSBH[0]
-        << "\nNew milage fee: " << MINIBUSBH[1]
-        << "\nNew security deposit fee: " << MINIBUSBH[2] << "\n\n";
+    cout << "New MiniBus flat fee: $" << MINIBUSBH[0]
+        << "\nNew milage fee: $" << MINIBUSBH[1] << " additional per mile"
+        << "\nNew security deposit fee: $" << MINIBUSBH[2] << "\n\n";
 }
 
 void Rates::setMiniVanRate(double changeAmount, double mileCost, double secDeposit) //Method sets Mini van bus hire rates
@@ -258,9 +329,9 @@ void Rates::setMiniVanRate(double changeAmount, double mileCost, double secDepos
     MINIVANBH[1] = mileCost;
     MINIVANBH[2] = secDeposit;
 
-    cout << "New MiniVan flat fee: " << MINIVANBH[0]
-        << "\nNew milage fee: " << MINIVANBH[1]
-        << "\nNew security deposit fee: " << MINIVANBH[2] << "\n\n";
+    cout << "New MiniVan flat fee: $" << MINIVANBH[0]
+        << "\nNew milage fee: $" << MINIVANBH[1]
+        << "\nNew security deposit fee: $" << MINIVANBH[2] << "\n\n";
 }
 
 double Rates::getLuxSeatRate() //Method returns Luxury bus "Other" seat  rate
@@ -433,17 +504,17 @@ void Rates::PrintTransaction(Rates Transaction) //Prints the transaction
 
 void Rates::CheckWeeklySales(Date date) //Prints total weekly sales
 {
-    cout << "Total Sales During Week of " << date.toString() << "\n\n";
+    cout << "\nTotal Sales During Week of " << date.toString() << "\n\n";
 
     double refunds = 0;
     double purchases = 0;
 
-    ifstream output;
-
-    output.open("./RatesInput.txt", ios::in);
-
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
     {
+        ifstream output;
+
+        output.open("./RatesInput.txt", ios::in);
+
         if (output.is_open()) 
         {
             Rates transaction = Rates();
@@ -468,10 +539,10 @@ void Rates::CheckWeeklySales(Date date) //Prints total weekly sales
             throw exception("There has been an issue trying to open RatesInput.txt");
         }
 
+        output.close();
+
         date.nextDay();
     }
-    
-    output.close();
 
     cout << "Total Purchases: " << fixed << setprecision(2) << purchases << "\n"
         << "Total Refunds: " << refunds << "\n"
