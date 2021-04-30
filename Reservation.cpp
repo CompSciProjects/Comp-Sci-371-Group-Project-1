@@ -5,6 +5,7 @@
 #include "Date.h"
 #include <iostream>
 #include <time.h>
+#include <iomanip>
 using namespace std;
 
 string months[12] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
@@ -397,13 +398,15 @@ void Reservation::SeatReservation() //Seat reservation section
 
 	int BusType = this->GetBusType(busType);
 
+	Rates().GetRate(BusType, Destination, false);
+
 	cout << "\nPlease enter about how many tickets you want: ";
 	int Tickets;
 	cin >> Tickets;
 
 	while (Tickets < 1 || Tickets > 12)
 	{
-		cout << "\nThat is too many tickets for reservation.\n"
+		cout << "\nThat is not a valid amount of tickets for reservation.\n"
 			<< "\nPlease enter about how many tickets you want: ";
 		cin.clear();
 		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -545,6 +548,8 @@ void Reservation::BusHire() //Bus hire section
 
 	int BusType = this->GetBusType(busType);
 
+	Rates().GetRate(BusType, Destination, true);
+
 	int Tickets;
 
 	if (BusType == 0)
@@ -641,6 +646,16 @@ void Reservation::CancelReservation() //Cancels reservation
 
 	Date date = Admin().EnterDate();
 
+	time_t ttime = time(0);
+	localtime_s(&tm, &ttime);
+	Date Current(1 + tm.tm_mon, tm.tm_mday, 1900 + tm.tm_year);
+
+	if ((Current.GetMonth() == date.GetMonth() && Current.GetDay() < date.GetDay()) || (Current.GetYear() == date.GetYear() && Current.GetMonth() > date.GetMonth()))
+	{
+		cout << "\nThat reservation has already been fulfilled. Cannot cancel reservation that has already happened.\n";
+		return;
+	}
+
 	if (Reservation().FindReservation(Name, date) && (Rates().FindTransaction(Name, date, Reasons[0]) || Rates().FindTransaction(Name, date, Reasons[1])))
 	{
 		Reservation reservation = Reservation().GetReservation(Name, date);
@@ -668,7 +683,7 @@ void Reservation::CancelReservation() //Cancels reservation
 	}
 }
 
-void Reservation::SaveReservation()
+void Reservation::SaveReservation() //Saves reservation
 {
 	fstream input;
 
@@ -837,7 +852,7 @@ void Reservation::PrintReservation() //Prints reservation
 		cout << ((this->isBusHire)? "This Reservation is for a bus hire." : "This is a personal reservation" ) << "\n\n";
 }
 
-void Reservation::DeleteReservation(Reservation reservation)
+void Reservation::DeleteReservation(Reservation reservation) //deletes reservation
 {
 	ifstream output;
 	
@@ -910,7 +925,7 @@ void Reservation::DeleteReservation(Reservation reservation)
 
 }
 
-void Reservation::ViewReservationByBusAndDate(long BusID, Date date)
+void Reservation::ViewReservationByBusAndDate(long BusID, Date date) //Prints all reservations for given bus and date
 {
 	bool reservations = false;
 
@@ -967,9 +982,10 @@ void Reservation::ViewReservationByBusAndDate(long BusID, Date date)
 	}
 }
 
-void Reservation::ViewIncomeByBusByDate(long BusID, Date date)
+void Reservation::ViewIncomeByBusByDate(long BusID, Date date) //prints income for given bus and date
 {
-	double amount = 0;
+	double purchases = 0;
+	double refunds = 0;
 
 	ifstream output;
 
@@ -1020,7 +1036,7 @@ void Reservation::ViewIncomeByBusByDate(long BusID, Date date)
 					transaction.GetTransaction(reservation.name, date, Reasons[3]);
 				}
 
-				amount += transaction.GetAmount();
+				purchases += transaction.GetAmount() - transaction.GetDeposit();
 			}
 
 			getline(output, reservation.name);
@@ -1028,7 +1044,7 @@ void Reservation::ViewIncomeByBusByDate(long BusID, Date date)
 
 		output.close();
 
-		cout << "The total revenue for bus number " << BusID << " on " << date.toString() << ": $" << amount << "\n\n";
+		cout << "\nThe total revenue for bus number " << BusID << " on " << date.toString() << ": $"<< fixed << setprecision(2) << purchases << "\n\n";
 	}
 	else
 	{
@@ -1036,7 +1052,7 @@ void Reservation::ViewIncomeByBusByDate(long BusID, Date date)
 	}
 }
 
-void Reservation::ChangeReservationName(string Name, Date date, string newName)
+void Reservation::ChangeReservationName(string Name, Date date, string newName) //changes name on reservation
 {
 	ifstream output;
 
@@ -1128,7 +1144,7 @@ void Reservation::ChangeReservationName(string Name, Date date, string newName)
 
 }
 
-void Reservation::CancelReservationByBusByDate(long BusID, Date date)
+void Reservation::CancelReservationByBusByDate(long BusID, Date date) //cancels all reservations for given bus and date
 {
 	bool isCanceled = false;
 	ifstream output;
@@ -1231,7 +1247,7 @@ void Reservation::CancelReservationByBusByDate(long BusID, Date date)
 	}
 }
 
-void Reservation::CancelReservationByBusByDate(long BusID, string Destination, Date date)
+void Reservation::CancelReservationByBusByDate(long BusID, string Destination, Date date) //cancels all reservations for given bus, destination, and date
 {
 	ifstream output;
 
